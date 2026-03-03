@@ -8,6 +8,9 @@ import About from './about';
 import ScheduleTimeline from './ScheduleTimeline';
 import RulesAndFAQ from './RulesAndFAQ';
 import Footer from './Footer';
+import hackathon from '@/data/hackathon.json';
+
+const { event, stats: statsData } = hackathon;
 
 /* ─── Spring ─── */
 const SPRING = { type: 'spring', stiffness: 300, damping: 24 };
@@ -158,7 +161,7 @@ function MarqueeStrip() {
 export default function HomeLoggedOut() {
   const reduce = useReducedMotion();
   const router = useRouter();
-  const time = useCountdown(new Date('2025-04-15T09:00:00'));
+  const time = useCountdown(new Date(event.hackathonStart));
 
   const handleRegister = () => router.push('/login');
   const scrollToAbout = () => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -170,18 +173,17 @@ export default function HomeLoggedOut() {
       <section className="relative min-h-screen flex flex-col overflow-hidden" style={{ paddingTop: '80px' }}>
         <Watermark />
 
-        {/* Star bursts */}
-        <StarBurst size={180} style={{ position: 'absolute', top: '6%', left: '3%', zIndex: 1, opacity: 0.95 }} />
+        {/* Star bursts — hidden on mobile to avoid clutter */}
+        <StarBurst size={160} style={{ position: 'absolute', top: '6%', left: '3%', zIndex: 1, opacity: 0.95, display: 'none' }} className="md:block" />
         <StarBurst size={120} style={{ position: 'absolute', bottom: '12%', left: '8%', zIndex: 1, opacity: 0.8 }} />
-        <StarBurst size={200} style={{ position: 'absolute', top: '5%', right: '2%', zIndex: 1, opacity: 0.9 }} />
+        <StarBurst size={180} style={{ position: 'absolute', top: '5%', right: '2%', zIndex: 1, opacity: 0.9 }} />
         <StarBurst size={90} style={{ position: 'absolute', bottom: '8%', right: '10%', zIndex: 1, opacity: 0.75 }} />
-        <StarBurst color="#00CCFF" size={70} style={{ position: 'absolute', top: '45%', right: '5%', zIndex: 1, opacity: 0.7 }} />
 
-        {/* Pixelated cursor decoration */}
-        <PixelCursor size={100} style={{ position: 'absolute', bottom: '18%', right: '30%', zIndex: 2, filter: 'drop-shadow(4px 4px 0px #001A6E)' }} />
+        {/* Pixelated cursor — hidden on small screens */}
+        <PixelCursor size={80} style={{ position: 'absolute', bottom: '18%', right: '28%', zIndex: 2, filter: 'drop-shadow(4px 4px 0px #001A6E)', display: 'none' }} />
 
         {/* Content */}
-        <div className="relative z-10 flex-1 max-w-6xl mx-auto w-full flex flex-col lg:flex-row items-center gap-10 px-6 py-16 lg:py-0">
+        <div className="relative z-10 flex-1 max-w-6xl mx-auto w-full flex flex-col lg:flex-row items-center gap-8 px-4 sm:px-6 py-10 sm:py-16 lg:py-0">
 
           {/* LEFT: Main window card */}
           <motion.div className="flex-1 w-full max-w-xl"
@@ -192,7 +194,7 @@ export default function HomeLoggedOut() {
                 {/* Badge */}
                 <div className="inline-block mb-4 px-3 py-1 font-bold text-xs uppercase tracking-widest"
                   style={{ background: '#CCFF00', border: '3px solid #001A6E', fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                  IEEE SB UCEK · HACKATHON
+                  {event.organizer} · HACKATHON
                 </div>
 
                 {/* Big title */}
@@ -214,7 +216,7 @@ export default function HomeLoggedOut() {
 
                 {/* Description */}
                 <p className="text-sm leading-relaxed mb-6 max-w-sm" style={{ color: '#334155', fontFamily: 'var(--y2k-font-ui)' }}>
-                  The ultimate 24-hour coding showdown. Build, compete, and win — organized by IEEE Student Branch UCEK.
+                  {event.tagline}. Build, compete, and win — organized by {event.organizer}.
                 </p>
 
                 {/* CTA buttons */}
@@ -259,22 +261,20 @@ export default function HomeLoggedOut() {
                 {/* Divider */}
                 <div style={{ borderTop: '2px solid #E2E8F0', marginBottom: '1rem' }} />
 
-                {/* Stats */}
+                {/* Stats from JSON */}
                 <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { v: '₹15K+', l: 'Prizes', c: '#CCFF00' },
-                    { v: '200+', l: 'Hackers', c: '#00CCFF' },
-                    { v: '20+', l: 'Mentors', c: '#FF44AA' },
-                    { v: '24hr', l: 'Duration', c: '#CCFF00' },
-                  ].map(({ v, l, c }) => (
-                    <div key={l} className="flex items-center gap-2 p-2" style={{ border: '2px solid #001A6E', background: '#F8FAFC' }}>
-                      <div className="w-3 h-3 shrink-0" style={{ background: c, border: '1.5px solid #001A6E' }} />
-                      <div>
-                        <div className="font-black text-base leading-none" style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>{v}</div>
-                        <div className="text-xs" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-mono)' }}>{l}</div>
+                  {statsData.map(({ value, label }, i) => {
+                    const c = ['#CCFF00', '#00CCFF', '#FF44AA', '#CCFF00'][i % 4];
+                    return (
+                      <div key={label} className="flex items-center gap-2 p-2" style={{ border: '2px solid #001A6E', background: '#F8FAFC' }}>
+                        <div className="w-3 h-3 shrink-0" style={{ background: c, border: '1.5px solid #001A6E' }} />
+                        <div>
+                          <div className="font-black text-base leading-none" style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>{value}</div>
+                          <div className="text-xs" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-mono)' }}>{label}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </WindowCard>
@@ -305,7 +305,7 @@ export default function HomeLoggedOut() {
       <MarqueeStrip />
 
       {/* ═══════════ FEATURES ═══════════ */}
-      <section className="relative py-20 px-6 overflow-hidden" style={{ background: '#0044DD' }}>
+      <section className="relative py-14 md:py-20 px-4 sm:px-6 overflow-hidden" style={{ background: '#0044DD' }}>
         <Watermark />
         <div className="relative z-10 max-w-6xl mx-auto">
           <motion.div className="mb-12"
@@ -320,7 +320,7 @@ export default function HomeLoggedOut() {
             </WindowCard>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               { title: 'Cash Prizes', desc: 'Compete for ₹15,000+ in prizes across multiple categories. Real rewards for real innovation.', color: '#CCFF00' },
               { title: 'Team Sprint', desc: '2-4 person teams tackling real problems in 24 hours. Collaboration at its finest.', color: '#00CCFF' },
