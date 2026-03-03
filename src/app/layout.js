@@ -1,20 +1,21 @@
 'use client';
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import Silk from "../ui/background";
 import LoadingWrapper from "../ui/LoadingWrapper";
 import FloatingDockDemo from "../ui/floating-demo";
 import { usePathname } from "next/navigation";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
+  weight: ["400", "500", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plusJakarta = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export default function RootLayout({ children }) {
@@ -24,12 +25,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${outfit.variable} ${plusJakarta.variable} antialiased`}
+        style={{ background: '#FFFDF5' }}
       >
-        {!isAdminRoute && <Silk />}
         {!isAdminRoute && <FloatingDockDemo />}
         <LoadingWrapper>
-          
           {children}
         </LoadingWrapper>
       </body>

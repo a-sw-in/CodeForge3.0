@@ -1,18 +1,18 @@
 "use client"
 
 import { cn } from "../lib/utils"
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react"
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion"
-
 import { useRef, useState } from "react"
+
+const COLORS = ['#CCFF00', '#00CCFF', '#FF44AA', '#CCFF00', '#00CCFF', '#FF44AA'];
 
 export const FloatingDock = ({ items, desktopClassName, mobileClassName }) => {
   const shouldReduceMotion = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: shouldReduceMotion ? 0.2 : 0.5, delay: shouldReduceMotion ? 0 : 0.2 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25, delay: shouldReduceMotion ? 0 : 0.3 }}
     >
       <FloatingDockDesktop items={items} className={desktopClassName} />
       <FloatingDockMobile items={items} className={mobileClassName} />
@@ -22,25 +22,26 @@ export const FloatingDock = ({ items, desktopClassName, mobileClassName }) => {
 
 const FloatingDockMobile = ({ items, className }) => {
   return (
-    <div className={cn("fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 block md:hidden", className)}>
-      <motion.div 
-        className="flex items-center gap-2 rounded-2xl bg-purple-900/80 backdrop-blur-lg px-4 py-3 border border-purple-500/30"
-        style={{
-          boxShadow: '0 0 20px rgba(134, 26, 133, 0.4), 0 0 40px rgba(81, 47, 141, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-        }}
+    <div className={cn("fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 block md:hidden", className)}>
+      <div
+        className="flex items-center gap-2 px-4 py-3 bg-white"
+        style={{ border: '3px solid #001A6E', boxShadow: '4px 4px 0px #001A6E' }}
       >
-        {items.map((item) => (
-          <a
-            key={item.title}
-            href={item.href}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-800/30 hover:bg-purple-700/50 transition-all border border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/30"
+        {items.map((item, i) => (
+          <a key={item.title} href={item.href}
+            className="flex h-9 w-9 items-center justify-center font-black text-xs"
+            style={{
+              background: COLORS[i % COLORS.length],
+              border: '2px solid #001A6E',
+              boxShadow: '2px 2px 0px #001A6E',
+              color: '#001A6E',
+            }}
+            title={item.title}
           >
-            <div className="h-5 w-5 text-purple-200 hover:text-purple-100 transition-colors">
-              {item.icon}
-            </div>
+            <div className="h-5 w-5">{item.icon}</div>
           </a>
         ))}
-      </motion.div>
+      </div>
     </div>
   )
 }
@@ -51,82 +52,64 @@ const FloatingDockDesktop = ({ items, className }) => {
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Number.POSITIVE_INFINITY)}
-      className={cn(
-        "fixed top-6 left-1/2 opacity-90 transform -translate-x-1/2 z-50 hidden md:flex items-center gap-16 rounded-2xl bg-purple-900/80 backdrop-blur-lg px-4 py-3 border border-purple-500/40 shadow-2xl",
-        className,
-      )}
-      style={{
-        boxShadow: '0 0 30px rgba(134, 26, 133, 0.5), 0 0 60px rgba(81, 47, 141, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-      }}
+      className={cn("fixed top-5 left-1/2 transform -translate-x-1/2 z-50 hidden md:flex items-center gap-2 px-5 py-3 bg-white", className)}
+      style={{ border: '3px solid #001A6E', boxShadow: '4px 4px 0px #001A6E' }}
     >
-      {items.map((item) => (
-        <IconContainer mouseX={mouseX} key={item.title} {...item} />
+      {/* Brand chip */}
+      <div className="flex items-center pr-4 mr-1" style={{ borderRight: '2px solid #E2E8F0' }}>
+        <div className="px-2 py-1 font-black text-sm" style={{ fontFamily: 'var(--y2k-font-display)', background: '#CCFF00', border: '2px solid #001A6E', color: '#001A6E' }}>
+          CF 3.0
+        </div>
+      </div>
+      {items.map((item, i) => (
+        <IconContainer mouseX={mouseX} key={item.title} {...item} colorIndex={i} />
       ))}
     </motion.div>
   )
 }
 
-function IconContainer({ mouseX, title, icon, href }) {
+function IconContainer({ mouseX, title, icon, href, colorIndex }) {
   const ref = useRef(null)
-
   const distance = useTransform(mouseX, (val) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 }
-
     return val - bounds.x - bounds.width / 2
   })
-
-  const widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40])
-  const heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40])
-
-  const widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20])
-  const heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20])
-
-  const width = useSpring(widthTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  })
-  const height = useSpring(heightTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  })
-
-  const widthIcon = useSpring(widthTransformIcon, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  })
-  const heightIcon = useSpring(heightTransformIcon, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  })
+  const widthTransform = useTransform(distance, [-150, 0, 150], [34, 52, 34])
+  const heightTransform = useTransform(distance, [-150, 0, 150], [34, 52, 34])
+  const widthTransformIcon = useTransform(distance, [-150, 0, 150], [16, 26, 16])
+  const heightTransformIcon = useTransform(distance, [-150, 0, 150], [16, 26, 16])
+  const width = useSpring(widthTransform, { mass: 0.1, stiffness: 150, damping: 12 })
+  const height = useSpring(heightTransform, { mass: 0.1, stiffness: 150, damping: 12 })
+  const widthIcon = useSpring(widthTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 })
+  const heightIcon = useSpring(heightTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 })
 
   const [hovered, setHovered] = useState(false)
+  const color = COLORS[colorIndex % COLORS.length];
 
   return (
     <a href={href}>
       <motion.div
         ref={ref}
-        style={{ width, height }}
+        style={{ width, height, background: color, border: '2px solid #001A6E', boxShadow: hovered ? '3px 3px 0px #001A6E' : '2px 2px 0px #001A6E' }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex aspect-square items-center justify-center rounded-full bg-purple-800/50 border border-purple-500/30"
+        className="relative flex items-center justify-center"
+        whileTap={{ x: 2, y: 2, boxShadow: '1px 1px 0px #001A6E' }}
       >
         <AnimatePresence>
           {hovered && (
             <motion.div
-              initial={{ opacity: 0, y: 10, x: "-50%" }}
+              initial={{ opacity: 0, y: 8, x: "-50%" }}
               animate={{ opacity: 1, y: 0, x: "-50%" }}
-              exit={{ opacity: 0, y: 2, x: "-50%" }}
-              className="absolute -top-8 left-1/2 w-fit rounded-md border border-purple-500/50 bg-purple-800/90 backdrop-blur-sm px-2 py-0.5 text-xs whitespace-pre text-purple-100"
+              exit={{ opacity: 0, y: 4, x: "-50%" }}
+              className="absolute -top-9 left-1/2 w-fit px-2 py-1 text-xs font-black uppercase whitespace-pre"
+              style={{ background: color, border: '2px solid #001A6E', boxShadow: '2px 2px 0px #001A6E', fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}
             >
               {title}
             </motion.div>
           )}
         </AnimatePresence>
-        <motion.div style={{ width: widthIcon, height: heightIcon }} className="flex items-center justify-center text-purple-200">
+        <motion.div style={{ width: widthIcon, height: heightIcon }} className="flex items-center justify-center text-[#001A6E]">
           {icon}
         </motion.div>
       </motion.div>

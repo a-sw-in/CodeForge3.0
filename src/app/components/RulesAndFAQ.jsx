@@ -3,197 +3,183 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
+const SPRING = { type: 'spring', stiffness: 300, damping: 24 };
+
+/* ── Y2K "IM Chat / Popup Dialog" sub-aesthetic ──
+   Background: lime/chartreuse (#CCFF00)
+   Cards: white popup windows styled like AIM/MSN Messenger dialogs
+   Answers: look like chat bubbles in a Y2K IM window
+   Vibe: early 2000s instant messaging, popup ads, dialog boxes
+*/
+
 const faqData = [
-  {
-    question: "Who can participate in CodeForge 3.0?",
-    answer: "CodeForge 3.0 is open to students, professionals, and coding enthusiasts of all skill levels. Whether you're a beginner or an expert, you're welcome to join and showcase your creativity!"
-  },
-  {
-    question: "Do I need a team to participate?",
-    answer: "While you can register individually, we encourage team participation (2-4 members). If you don't have a team, don't worry! We'll help you connect with other participants during the networking session."
-  },
-  {
-    question: "What should I bring to the hackathon?",
-    answer: "Bring your laptop, chargers, any hardware you might need, and lots of enthusiasm! We'll provide food, drinks, WiFi, and a collaborative workspace. Don't forget your student ID for verification."
-  },
-  {
-    question: "Are there any themes or problem statements?",
-    answer: "Yes! We'll announce specific themes and problem statements at the opening ceremony. These will focus on current tech trends like AI/ML, Web3, IoT, Sustainability, and Social Impact."
-  },
-  {
-    question: "What are the prizes and rewards?",
-    answer: "Winners will receive cash prizes, certificates, mentorship opportunities, and internship offers from our sponsor companies. All participants get certificates and exclusive CodeForge merchandise!"
-  },
-  {
-    question: "Can I use external APIs and libraries?",
-    answer: "Absolutely! You can use any open-source libraries, APIs, frameworks, and tools. However, the core innovation and problem-solving must be your original work created during the hackathon."
-  },
-  {
-    question: "Is there any registration fee?",
-    answer: "No, CodeForge 3.0 is completely free to participate! This includes access to all events, meals, networking sessions, workshops, and mentorship throughout the hackathon."
-  },
-  {
-    question: "Will there be mentors available during the event?",
-    answer: "Yes! We have industry experts and senior developers available throughout the hackathon to provide guidance, technical support, and feedback on your projects."
-  }
+  { question: 'Who can participate in CodeForge 3.0?', answer: "Open to students, professionals, and coding enthusiasts of all skill levels. Beginner or expert — you're welcome!" },
+  { question: 'Do I need a team?', answer: "Teams of 2-4 encouraged. Solo entries welcome. We'll help you find a team at the networking session." },
+  { question: 'What should I bring?', answer: "Laptop, chargers, student ID, enthusiasm. We provide food, drinks, WiFi, and workspace throughout the event." },
+  { question: 'Are there problem statements?', answer: "Yes! Announced at the opening. Themes: AI/ML, Web3, IoT, Sustainability, and Social Impact." },
+  { question: 'What are the prizes?', answer: "Cash prizes, certificates, mentorship, internship offers from sponsors. All participants get certificates and merch!" },
+  { question: 'Can I use external libraries?', answer: "Yes! Any open-source tools allowed. Core innovation must be original work created during the hackathon." },
+  { question: 'Is there a registration fee?', answer: "No! Completely free — including events, meals, networking, workshops, and mentorship." },
+  { question: 'Will there be mentors?', answer: "Yes! Industry experts and senior devs available throughout to give guidance and technical support." },
 ];
 
+/* Blinking status dot */
+function BlinkDot({ color }) {
+  return (
+    <motion.div className="w-2 h-2 rounded-full shrink-0"
+      style={{ background: color }}
+      animate={{ opacity: [1, 0.2, 1] }}
+      transition={{ duration: 1.2, repeat: Infinity }} />
+  );
+}
+
 export default function RulesAndFAQ() {
-  const [expandedFAQ, setExpandedFAQ] = useState(null);
-  const shouldReduceMotion = useReducedMotion();
-
-  const toggleFAQ = (index) => {
-    setExpandedFAQ(expandedFAQ === index ? null : index);
-  };
-
-  // Optimized animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: shouldReduceMotion ? 0.1 : 0.4,
-        staggerChildren: shouldReduceMotion ? 0 : 0.05
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: shouldReduceMotion ? 0.1 : 0.3,
-        ease: "easeOut"
-      }
-    }
-  };
+  const [expanded, setExpanded] = useState(null);
+  const reduce = useReducedMotion();
 
   return (
-    <section className="w-full max-w-4xl mx-auto py-16 px-4 md:px-6">
-      {/* Header */}
-      <motion.div
-        className="text-center mb-12"
-        initial="hidden"
-        whileInView="visible"
-        variants={containerVariants}
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <motion.h2
-          className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-transparent"
-          variants={itemVariants}
-          style={{ willChange: 'transform, opacity' }}
-        >
-          Frequently Asked Questions
-        </motion.h2>
-        <motion.p
-          className="text-purple-200 text-lg max-w-2xl mx-auto opacity-90"
-          variants={itemVariants}
-          style={{ willChange: 'transform, opacity' }}
-        >
-          Got questions? We've got answers!
-        </motion.p>
-      </motion.div>
+    <section id="register-section" className="relative py-20 px-6 overflow-hidden" style={{ background: '#CCFF00' }}>
+      {/* Diagonal texture on bg */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ backgroundImage: 'repeating-linear-gradient(-45deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 8px)' }} />
 
-      {/* FAQ Accordion */}
-      <motion.div 
-        className="space-y-4"
-        initial="hidden"
-        whileInView="visible"
-        variants={containerVariants}
-        viewport={{ once: true, amount: 0.1 }}
-      >
-        {faqData.map((faq, index) => (
-          <motion.div
-            key={index}
-            className="bg-gradient-to-br from-purple-900/40 to-purple-800/30 border border-purple-500/30 rounded-2xl overflow-hidden backdrop-blur-xl hover:border-purple-400/50 transition-colors duration-200"
-            variants={itemVariants}
-            style={{ willChange: 'transform, opacity' }}
-          >
-            <motion.button
-              onClick={() => toggleFAQ(index)}
-              className="w-full p-6 text-left flex items-center justify-between hover:bg-purple-800/20 transition-colors duration-200 group"
-              whileHover={shouldReduceMotion ? {} : { scale: 1.001 }}
-              whileTap={shouldReduceMotion ? {} : { scale: 0.999 }}
-              transition={{ duration: 0.1 }}
-            >
-              <div className="flex items-start gap-4 flex-1">
-                <motion.div
-                  className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 mt-1"
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
-                  transition={{ duration: 0.15 }}
-                  style={{ willChange: 'transform' }}
-                >
-                  Q
-                </motion.div>
-                <h3 className="text-lg font-semibold text-purple-200 leading-relaxed group-hover:text-purple-100 transition-colors duration-200">
-                  {faq.question}
-                </h3>
+      <div className="relative z-10 max-w-3xl mx-auto">
+
+        {/* ── IM window header ── */}
+        <motion.div className="mb-8"
+          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+          transition={SPRING} viewport={{ once: true }}>
+          {/* Outer window frame */}
+          <div style={{ border: '3px solid #001A6E', background: '#FFFFFF', boxShadow: '6px 6px 0px #001A6E' }}>
+            {/* Title bar — deep blue like classic IM */}
+            <div className="flex items-center gap-2 px-3 py-2"
+              style={{ background: 'linear-gradient(90deg, #0055FF 0%, #0033AA 100%)', borderBottom: '3px solid #001A6E' }}>
+              <BlinkDot color="#00FF88" />
+              <span className="flex-1 font-black text-xs uppercase tracking-widest text-white"
+                style={{ fontFamily: 'var(--y2k-font-mono)' }}>
+                CodeForge_FAQ v1.0 — You have {faqData.length} new messages
+              </span>
+              <div className="flex gap-1">
+                {['—', '□', '✕'].map(c => (
+                  <div key={c} className="w-4 h-4 bg-white flex items-center justify-center text-xs font-black"
+                    style={{ border: '1.5px solid rgba(0,26,110,0.5)', color: '#001A6E' }}>{c}</div>
+                ))}
               </div>
-              <motion.div
-                animate={{ 
-                  rotate: expandedFAQ === index ? 180 : 0,
-                  transition: { duration: shouldReduceMotion ? 0.1 : 0.2 }
-                }}
-                className="text-purple-400 flex-shrink-0 ml-4 group-hover:text-purple-300 transition-colors duration-200"
-                style={{ willChange: 'transform' }}
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </motion.div>
-            </motion.button>
+            </div>
+            <div className="px-6 py-5">
+              <h2 className="text-5xl md:text-7xl font-black uppercase leading-none"
+                style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', letterSpacing: '-0.01em' }}>
+                GOT QUESTIONS?
+              </h2>
+              <p className="font-black text-xs uppercase mt-1" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#64748B' }}>
+                Click any message to expand reply
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
-            <AnimatePresence initial={false}>
-              {expandedFAQ === index && (
-                <motion.div
-                  key="content"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ 
-                    height: 'auto', 
-                    opacity: 1,
-                    transition: {
-                      height: { duration: shouldReduceMotion ? 0.1 : 0.2, ease: "easeOut" },
-                      opacity: { duration: shouldReduceMotion ? 0.1 : 0.15, delay: shouldReduceMotion ? 0 : 0.05 }
-                    }
-                  }}
-                  exit={{ 
-                    height: 0, 
-                    opacity: 0,
-                    transition: {
-                      height: { duration: shouldReduceMotion ? 0.1 : 0.15, ease: "easeIn" },
-                      opacity: { duration: shouldReduceMotion ? 0.05 : 0.1 }
-                    }
-                  }}
-                  className="overflow-hidden"
-                  style={{ willChange: 'height, opacity' }}
-                >
-                  <div className="px-6 pb-6">
-                    <div className="bg-purple-900/20 rounded-xl p-5 ml-14 border-l-4 border-purple-500/50">
-                      <motion.div
-                        initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 5 }}
-                        animate={{ 
-                          opacity: 1, 
-                          y: 0,
-                          transition: { duration: shouldReduceMotion ? 0.1 : 0.2, delay: shouldReduceMotion ? 0 : 0.1 }
-                        }}
-                        className="flex items-start gap-3"
-                        style={{ willChange: 'transform, opacity' }}
-                      >
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-400 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 mt-1">
-                          A
-                        </div>
-                        <p className="text-purple-100 leading-relaxed text-sm md:text-base">{faq.answer}</p>
-                      </motion.div>
+        {/* ── Chat messages ── */}
+        <div className="space-y-3">
+          {faqData.map((faq, idx) => {
+            const isOpen = expanded === idx;
+            const COLORS = ['#0055FF', '#FF44AA', '#0055FF', '#FF44AA', '#0055FF', '#FF44AA', '#0055FF', '#FF44AA'];
+            const color = COLORS[idx];
+            const isBlue = color === '#0055FF';
+
+            return (
+              <motion.div key={idx}
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING, delay: idx * 0.04 }} viewport={{ once: true, margin: '-10px' }}>
+                <div style={{
+                  border: '3px solid #001A6E',
+                  background: '#FFFFFF',
+                  boxShadow: isOpen ? `5px 5px 0px ${color}` : '3px 3px 0px rgba(0,26,110,0.4)',
+                  transition: 'box-shadow 0.15s ease',
+                }}>
+                  {/* Question row — IM user row */}
+                  <button onClick={() => setExpanded(isOpen ? null : idx)}
+                    className="w-full flex items-center gap-3 p-3 text-left group">
+                    {/* Avatar */}
+                    <div className="w-9 h-9 flex items-center justify-center font-black text-white shrink-0"
+                      style={{ background: color, border: '2px solid #001A6E', fontFamily: 'var(--y2k-font-display)', fontSize: '0.9rem' }}>
+                      {`${String.fromCharCode(65 + (idx % 26))}`}
                     </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        ))}
-      </motion.div>
+                    {/* Message bubble */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="font-black text-xs uppercase" style={{ fontFamily: 'var(--y2k-font-mono)', color: color }}>
+                          user_{String(idx + 1).padStart(3, '0')}
+                        </span>
+                        <span className="text-xs" style={{ color: '#94A3B8', fontFamily: 'var(--y2k-font-mono)' }}>asks:</span>
+                      </div>
+                      <p className="font-bold text-sm" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                        {faq.question}
+                      </p>
+                    </div>
+                    {/* Expand indicator */}
+                    <motion.div
+                      animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.18 }}
+                      className="w-7 h-7 flex items-center justify-center font-black shrink-0"
+                      style={{
+                        background: isOpen ? color : '#F1F5F9',
+                        border: '2px solid #001A6E',
+                        color: isOpen ? '#FFFFFF' : '#001A6E',
+                        fontFamily: 'var(--y2k-font-ui)',
+                        fontSize: '1rem',
+                        transition: 'background 0.2s, color 0.2s',
+                      }}>
+                      +
+                    </motion.div>
+                  </button>
+
+                  {/* Answer — chat reply */}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        key="reply"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1, transition: { height: { duration: 0.22 }, opacity: { duration: 0.15, delay: 0.05 } } }}
+                        exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.18 }, opacity: { duration: 0.1 } } }}
+                        className="overflow-hidden">
+                        <div className="px-3 pb-3" style={{ borderTop: '2px solid #E2E8F0' }}>
+                          {/* Bot avatar row */}
+                          <div className="flex items-start gap-3 pt-3">
+                            <div className="w-9 h-9 flex items-center justify-center font-black shrink-0"
+                              style={{ background: '#CCFF00', border: '2px solid #001A6E', fontFamily: 'var(--y2k-font-display)', color: '#001A6E', fontSize: '0.75rem' }}>
+                              CF
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-black text-xs uppercase" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#CCFF00', textShadow: '0 0 0 #001A6E', WebkitTextStroke: '0.5px #001A6E' }}>
+                                  CodeForge_Bot
+                                </span>
+                                <span className="text-xs" style={{ color: '#94A3B8', fontFamily: 'var(--y2k-font-mono)' }}>replies:</span>
+                              </div>
+                              {/* Chat bubble */}
+                              <div className="p-3 text-sm" style={{ background: '#F0FFF4', border: '2px solid #001A6E', fontFamily: 'var(--y2k-font-ui)', color: '#334155', lineHeight: '1.65' }}>
+                                {faq.answer}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Bottom system message */}
+        <motion.div className="mt-6 flex items-center gap-2"
+          initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
+          <BlinkDot color="#001A6E" />
+          <p className="text-xs font-black uppercase" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>
+            Still have questions? Email us at ieeesbucek@gmail.com
+          </p>
+        </motion.div>
+      </div>
     </section>
   );
 }

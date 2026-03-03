@@ -2,362 +2,358 @@
 
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { IconArrowRight, IconTrophy, IconUsers, IconBolt, IconX } from '@tabler/icons-react';
 import About from './about';
 import ScheduleTimeline from './ScheduleTimeline';
 import RulesAndFAQ from './RulesAndFAQ';
 import Footer from './Footer';
 
+/* ─── Spring ─── */
+const SPRING = { type: 'spring', stiffness: 300, damping: 24 };
+
+/* ─── Countdown ─── */
+function useCountdown(targetDate) {
+  const calc = () => {
+    const diff = Math.max(0, targetDate - Date.now());
+    return {
+      days: String(Math.floor(diff / 86400000)).padStart(2, '0'),
+      hours: String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0'),
+      minutes: String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0'),
+      seconds: String(Math.floor((diff % 60000) / 1000)).padStart(2, '0'),
+    };
+  };
+  const [t, setT] = useState(calc);
+  useEffect(() => { const id = setInterval(() => setT(calc()), 1000); return () => clearInterval(id); }, []);
+  return t;
+}
+
+/* ─── Repeating text watermark background ─── */
+function Watermark() {
+  const phrase = 'CODEFORGE · IEEE · UCEK · HACKATHON · ';
+  const rows = 12;
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
+      {Array.from({ length: rows }).map((_, r) => (
+        <div key={r} className="flex whitespace-nowrap"
+          style={{ marginTop: r === 0 ? '2vh' : 0, opacity: 0.12 }}>
+          <span className="text-white text-4xl md:text-5xl font-black uppercase tracking-wider shrink-0"
+            style={{ fontFamily: 'var(--y2k-font-display)', lineHeight: '1.15', paddingBottom: '0.1em' }}>
+            {phrase.repeat(6)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Star Burst ─── */
+function StarBurst({ color = '#CCFF00', size = 140, style = {} }) {
+  const pts = '50,2 59,29 81,15 70,40 97,34 79,55 100,50 79,45 97,66 70,60 81,85 59,71 50,98 41,71 19,85 30,60 3,66 21,45 0,50 21,55 3,34 30,40 19,15 41,29';
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" style={style} aria-hidden="true">
+      <polygon points={pts} fill={color} />
+    </svg>
+  );
+}
+
+/* ─── Pixelated cursor SVG ─── */
+function PixelCursor({ size = 80, style = {} }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" style={style} aria-hidden="true">
+      <rect x="2" y="2" width="4" height="4" fill="#fff" />
+      <rect x="2" y="6" width="4" height="4" fill="#fff" />
+      <rect x="2" y="10" width="4" height="4" fill="#fff" />
+      <rect x="2" y="14" width="4" height="4" fill="#fff" />
+      <rect x="2" y="18" width="4" height="4" fill="#fff" />
+      <rect x="6" y="6" width="4" height="4" fill="#fff" />
+      <rect x="6" y="10" width="4" height="4" fill="#fff" />
+      <rect x="6" y="14" width="4" height="4" fill="#fff" />
+      <rect x="10" y="10" width="4" height="4" fill="#fff" />
+      <rect x="10" y="14" width="4" height="4" fill="#fff" />
+      <rect x="10" y="18" width="4" height="4" fill="#fff" />
+      <rect x="14" y="14" width="4" height="4" fill="#fff" />
+      <rect x="14" y="18" width="4" height="4" fill="#fff" />
+      <rect x="14" y="22" width="4" height="4" fill="#fff" />
+      <rect x="18" y="18" width="4" height="4" fill="#fff" />
+      <rect x="18" y="22" width="4" height="4" fill="#fff" />
+      {/* black outline */}
+      <rect x="0" y="0" width="4" height="6" fill="#000" />
+      <rect x="0" y="4" width="2" height="18" fill="#000" />
+      <rect x="4" y="4" width="2" height="2" fill="#000" />
+    </svg>
+  );
+}
+
+/* ─── Window Card ─── */
+function WindowCard({ logo = 'CF 3.0', children, className = '', style = {} }) {
+  return (
+    <div className={`flex flex-col ${className}`}
+      style={{ border: '3px solid #001A6E', background: '#FFFFFF', ...style }}>
+      {/* Title bar */}
+      <div className="flex items-center justify-between px-3 py-2 shrink-0"
+        style={{ background: '#CCFF00', borderBottom: '3px solid #001A6E' }}>
+        <span className="font-bold text-sm" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.02em' }}>
+          {logo}
+        </span>
+        <div className="flex items-center justify-center w-6 h-6 bg-white"
+          style={{ border: '2px solid #001A6E', cursor: 'pointer' }}>
+          <IconX size={12} strokeWidth={3} color="#001A6E" />
+        </div>
+      </div>
+      {/* Content */}
+      <div className="flex-1">{children}</div>
+    </div>
+  );
+}
+
+/* ─── Y2K Button ─── */
+function Y2KButton({ children, onClick, variant = 'primary' }) {
+  const isPrimary = variant === 'primary';
+  return (
+    <motion.button onClick={onClick}
+      className="inline-flex items-center gap-2 px-6 py-2.5 font-bold uppercase tracking-wider text-sm"
+      style={{
+        fontFamily: 'var(--y2k-font-ui)',
+        background: isPrimary ? '#CCFF00' : 'transparent',
+        color: '#001A6E',
+        border: '3px solid #001A6E',
+        letterSpacing: '0.08em',
+        boxShadow: isPrimary ? '4px 4px 0px #001A6E' : 'none',
+      }}
+      whileHover={{ x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E', transition: { duration: 0.15 } }}
+      whileTap={{ x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' }}
+    >
+      {children}
+      {isPrimary && <IconArrowRight size={16} strokeWidth={3} />}
+    </motion.button>
+  );
+}
+
+/* ─── Feature card data ─── */
+const FEATURES = [
+  { icon: IconTrophy, label: '₹15K+', sub: 'Prize Pool', color: '#CCFF00' },
+  { icon: IconUsers, label: '2–4', sub: 'Team Size', color: '#00CCFF' },
+  { icon: IconBolt, label: '24hr', sub: 'Hackathon', color: '#FF44AA' },
+];
+
+/* ─── Marquee strip ─── */
+function MarqueeStrip() {
+  const words = ['CODEFORGE 3.0', '★', 'IEEE UCEK', '★', '24 HOURS', '★', 'BUILD & WIN', '★', 'MARCH 2025', '★'];
+  const rep = [...words, ...words];
+  return (
+    <div className="w-full overflow-hidden py-3" style={{ background: '#CCFF00', borderTop: '3px solid #001A6E', borderBottom: '3px solid #001A6E' }}>
+      <div className="pg-animate-marquee flex whitespace-nowrap w-max gap-8">
+        {rep.map((w, i) => (
+          <span key={i} className="text-sm font-black uppercase tracking-widest" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+            {w}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main ─── */
 export default function HomeLoggedOut() {
-  const shouldReduceMotion = useReducedMotion();
-  const [timeLeft, setTimeLeft] = useState({
-    days: '00',
-    hours: '00',
-    minutes: '00',
-    seconds: '00',
-  });
+  const reduce = useReducedMotion();
+  const router = useRouter();
+  const time = useCountdown(new Date('2025-04-15T09:00:00'));
 
-  useEffect(() => {
-    // Replace this with actual countdown logic if needed
-    const interval = setInterval(() => {
-      setTimeLeft({
-        days: '30',
-        hours: '00',
-        minutes: '00',
-        seconds: '00',
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const handleRegister = () => router.push('/login');
+  const scrollToAbout = () => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <>
-      <motion.div 
-        className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 md:px-6 text-white pb-20 md:pb-6 pt-20 md:pt-24"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.1 : 0.3 }}
-        style={{ willChange: 'opacity' }}
-      >
-        
-        {/* Floating geometric shapes with staggered animations */}
-        <motion.div 
-          className="absolute inset-0 overflow-hidden pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: shouldReduceMotion ? 0.3 : 1 }}
-          transition={{ duration: shouldReduceMotion ? 0.5 : 2, delay: shouldReduceMotion ? 0.2 : 0.8 }}
-        >
-          {/* Animated circles */}
-          <motion.div 
-            className="absolute top-20 left-10 w-32 h-32 border border-purple-500/30 rounded-full animate-pulse"
-            initial={{ scale: 0, rotate: shouldReduceMotion ? 0 : -180 }}
-            animate={{ scale: shouldReduceMotion ? 1 : 1, rotate: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1.5, delay: shouldReduceMotion ? 0.2 : 1, ease: "easeOut" }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          />
-          <motion.div 
-            className="absolute top-40 right-20 w-20 h-20 border border-purple-400/40 rounded-full animate-ping"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1.2, delay: shouldReduceMotion ? 0.2 : 1.2, ease: "easeOut" }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          />
-          <motion.div 
-            className="absolute bottom-40 left-20 w-16 h-16 bg-purple-600/20 rounded-full animate-bounce"
-            initial={{ y: shouldReduceMotion ? 0 : 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.2 : 1.4, ease: "easeOut" }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          />
-          
-          {/* Floating hexagons */}
-          <motion.div 
-            className="absolute top-60 right-10 w-24 h-24 border border-purple-300/30 transform rotate-45 animate-spin" 
-            style={{animationDuration: shouldReduceMotion ? '40s' : '20s', willChange: shouldReduceMotion ? 'auto' : 'transform'}}
-            initial={{ scale: 0, rotate: 45 }}
-            animate={{ scale: 1, rotate: 45 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1.3, delay: shouldReduceMotion ? 0.2 : 1.6, ease: "easeOut" }}
-          />
-          <motion.div 
-            className="absolute bottom-60 right-40 w-12 h-12 border border-purple-500/40 transform rotate-12 animate-pulse"
-            initial={{ scale: 0, rotate: 12 }}
-            animate={{ scale: 1, rotate: 12 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1.1, delay: shouldReduceMotion ? 0.2 : 1.8, ease: "easeOut" }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          />
-        </motion.div>
+    <div style={{ background: '#0055FF', fontFamily: 'var(--y2k-font-ui)', color: '#FFFFFF' }}>
 
-        {/* Main Content Container with morphing entrance */}
-        <motion.div 
-          className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between z-10 gap-6 lg:gap-16"
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 50, scale: shouldReduceMotion ? 1 : 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: shouldReduceMotion ? 0.4 : 1.2, delay: shouldReduceMotion ? 0.1 : 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-        >
-          
-          {/* Left Content - Enhanced with morphing title */}
-          <motion.div 
-            className="text-center lg:text-left max-w-2xl relative"
-            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0.4 : 1, delay: shouldReduceMotion ? 0.2 : 0.7, ease: "easeOut" }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          >
-            
-            {/* Glitch effect background text */}
-            <motion.div 
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.1 }}
-              transition={{ duration: 2, delay: 1.5 }}
-            >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-purple-400 animate-pulse">
-                CODEFORGE 3.0
-              </h1>
-            </motion.div>
-            
-            {/* IEEE Badge */}
-            <motion.div 
-              className="inline-flex items-center gap-2 bg-purple-900/30 backdrop-blur-sm border border-purple-500/30 rounded-full px-4 py-2 mb-6"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-            >
-              <motion.div 
-                className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 1.2 }}
-              />
-              <motion.p 
-                className="uppercase text-xs tracking-widest text-purple-200"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 1.3 }}
-              >
-                IEEE Student Branch UCEK
-              </motion.p>
-            </motion.div>
-            
-            {/* Main Title with enhanced morphing styling */}
-            <motion.h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight"
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 100, scale: shouldReduceMotion ? 1 : 0.8, filter: shouldReduceMotion ? "blur(0px)" : "blur(20px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              transition={{ duration: shouldReduceMotion ? 0.4 : 1.5, delay: shouldReduceMotion ? 0.2 : 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-              style={{ willChange: shouldReduceMotion ? 'auto' : 'transform, filter' }}
-            >
-              <motion.span 
-                className="relative"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.3 : 1.2 }}
-              >
-                CodeForge 3.0
-                <motion.span 
-                  className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-400 blur opacity-30 animate-pulse"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: shouldReduceMotion ? 0.2 : 0.3 }}
-                  transition={{ duration: shouldReduceMotion ? 0.3 : 2, delay: shouldReduceMotion ? 0.3 : 1.5 }}
-                />
-              </motion.span>
-              <br />
-              <motion.span 
-                className="text-purple-100 text-3xl md:text-4xl lg:text-5xl"
-                initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.3 : 1.4 }}
-                style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-              >
-                Hackathon
-              </motion.span>
-            </motion.h1>
-            
-            {/* Enhanced description */}
-            <motion.p 
-              className="mt-6 text-lg md:text-xl text-purple-100 leading-relaxed"
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.3 : 1.6 }}
-              style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-            >
-              Join us for the ultimate 
-              <motion.span 
-                className="text-purple-300 font-semibold"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 0.8, delay: shouldReduceMotion ? 0.3 : 1.8 }}
-              > coding competition </motion.span>
-              where innovation meets creativity. 
-              <br className="hidden md:block" />
-              Build, compete, and win amazing prizes!
-            </motion.p>
-            
-            {/* CTA Buttons with staggered entrance */}
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 mt-8"
-              initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.4 : 1.8 }}
-              style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-            >
-              <motion.button 
-                className="group relative px-8 py-4 md:mx-0 mx-6 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold rounded-lg shadow-lg transition-all transform hover:scale-105 hover:shadow-purple-500/25 hover:shadow-2xl"
-                initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 0.8, delay: shouldReduceMotion ? 0.4 : 2 }}
-                whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-              >
-                <span className="relative z-10">Register Now</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-purple-500 rounded-lg blur opacity-0 group-hover:opacity-30 transition-opacity"></div>
-              </motion.button>
-              
-              <motion.button 
-                className="px-8 py-4 mx-6 border-2 border-purple-500 text-purple-300 hover:bg-purple-500/10 font-semibold rounded-lg transition-all transform hover:scale-105"
-                initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 0.8, delay: shouldReduceMotion ? 0.4 : 2.2 }}
-                whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-              >
-                Learn More
-              </motion.button>
-            </motion.div>
-            
+      {/* ═══════════ HERO ═══════════ */}
+      <section className="relative min-h-screen flex flex-col overflow-hidden" style={{ paddingTop: '80px' }}>
+        <Watermark />
+
+        {/* Star bursts */}
+        <StarBurst size={180} style={{ position: 'absolute', top: '6%', left: '3%', zIndex: 1, opacity: 0.95 }} />
+        <StarBurst size={120} style={{ position: 'absolute', bottom: '12%', left: '8%', zIndex: 1, opacity: 0.8 }} />
+        <StarBurst size={200} style={{ position: 'absolute', top: '5%', right: '2%', zIndex: 1, opacity: 0.9 }} />
+        <StarBurst size={90} style={{ position: 'absolute', bottom: '8%', right: '10%', zIndex: 1, opacity: 0.75 }} />
+        <StarBurst color="#00CCFF" size={70} style={{ position: 'absolute', top: '45%', right: '5%', zIndex: 1, opacity: 0.7 }} />
+
+        {/* Pixelated cursor decoration */}
+        <PixelCursor size={100} style={{ position: 'absolute', bottom: '18%', right: '30%', zIndex: 2, filter: 'drop-shadow(4px 4px 0px #001A6E)' }} />
+
+        {/* Content */}
+        <div className="relative z-10 flex-1 max-w-6xl mx-auto w-full flex flex-col lg:flex-row items-center gap-10 px-6 py-16 lg:py-0">
+
+          {/* LEFT: Main window card */}
+          <motion.div className="flex-1 w-full max-w-xl"
+            initial={{ opacity: 0, y: reduce ? 0 : 60 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING, delay: 0.15 }}>
+            <WindowCard logo="codeforge™">
+              <div className="p-6 md:p-8">
+                {/* Badge */}
+                <div className="inline-block mb-4 px-3 py-1 font-bold text-xs uppercase tracking-widest"
+                  style={{ background: '#CCFF00', border: '3px solid #001A6E', fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                  IEEE SB UCEK · HACKATHON
+                </div>
+
+                {/* Big title */}
+                <h1 className="text-6xl md:text-8xl font-black uppercase leading-none mb-2"
+                  style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', letterSpacing: '-0.01em' }}>
+                  CODE<br />FORGE
+                </h1>
+                <p className="text-2xl md:text-3xl font-black uppercase mb-1"
+                  style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', letterSpacing: '0.05em' }}>
+                  3.0
+                </p>
+
+                {/* Subtext row */}
+                <div className="flex flex-wrap gap-3 mt-4 mb-6">
+                  <span className="text-xs font-mono font-bold uppercase" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-mono)' }}>
+                    CYBER ATMOSPHERE
+                  </span>
+                </div>
+
+                {/* Description */}
+                <p className="text-sm leading-relaxed mb-6 max-w-sm" style={{ color: '#334155', fontFamily: 'var(--y2k-font-ui)' }}>
+                  The ultimate 24-hour coding showdown. Build, compete, and win — organized by IEEE Student Branch UCEK.
+                </p>
+
+                {/* CTA buttons */}
+                <div className="flex flex-wrap gap-3">
+                  <Y2KButton onClick={handleRegister}>Register Now</Y2KButton>
+                  <Y2KButton onClick={scrollToAbout} variant="secondary">Learn More</Y2KButton>
+                </div>
+
+                {/* Bottom label row */}
+                <div className="flex gap-6 mt-6 pt-4" style={{ borderTop: '2px dashed #CBD5E1' }}>
+                  <span className="text-xs font-black uppercase" style={{ color: '#94A3B8', fontFamily: 'var(--y2k-font-mono)' }}>HACKATHON</span>
+                  <span className="text-xs font-black uppercase" style={{ color: '#94A3B8', fontFamily: 'var(--y2k-font-mono)' }}>IEEE 2025</span>
+                </div>
+              </div>
+            </WindowCard>
           </motion.div>
-          
-          {/* Right: Compact Timer - Mobile Optimized with entrance animation */}
-          <motion.div 
-            className="relative w-full max-w-sm lg:max-w-md"
-            initial={{ opacity: 0, x: shouldReduceMotion ? 0 : 100, rotateY: shouldReduceMotion ? 0 : 45 }}
-            animate={{ opacity: 1, x: 0, rotateY: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0.4 : 1.2, delay: shouldReduceMotion ? 0.3 : 1, ease: "easeOut" }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          >
-            {/* Glowing background effect */}
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-purple-400/20 rounded-2xl blur-lg"
-              initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: shouldReduceMotion ? 0.3 : 1.5, delay: shouldReduceMotion ? 0.3 : 1.2 }}
-              style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-            />
-            
-            <motion.div 
-              className="relative bg-black/60 backdrop-blur-xl rounded-2xl p-4 md:p-6 shadow-2xl border border-purple-500/30 hover:border-purple-400/50 transition-all"
-              initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.3 : 1.3 }}
-              style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-            >
-              
-              {/* Header */}
-              <motion.div 
-                className="text-center mb-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 1.5 }}
-              >
-                <h3 className="text-purple-200 text-xs md:text-sm uppercase tracking-wide mb-2">Event Starts In</h3>
-                <div className="h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
-              </motion.div>
-              
-              {/* Compact Timer Grid with staggered number animations */}
-              <motion.div 
-                className="flex justify-center gap-2 md:gap-3 mb-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.4 : 1.7 }}
-              >
-                {[
-                  { label: 'Days', value: timeLeft.days },
-                  { label: 'Hours', value: timeLeft.hours },
-                  { label: 'Minutes', value: timeLeft.minutes },
-                  { label: 'Seconds', value: timeLeft.seconds }
-                ].map((unit, index) => (
-                  <motion.div 
-                    key={unit.label} 
-                    className="text-center flex-1 max-w-16 md:max-w-20"
-                    initial={{ opacity: 0, scale: 0, rotateY: shouldReduceMotion ? 0 : 180 }}
-                    animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                    transition={{ duration: shouldReduceMotion ? 0.3 : 0.8, delay: shouldReduceMotion ? 0.4 + index * 0.05 : 1.8 + index * 0.1, ease: "easeOut" }}
-                    style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-                  >
-                    <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-lg p-2 md:p-3 border border-purple-400/30 hover:border-purple-300/50 transition-all group">
-                      <div className="text-lg md:text-2xl lg:text-3xl font-mono font-bold text-purple-100 group-hover:text-white transition-colors leading-none">
-                        {unit.value}
+
+          {/* RIGHT: Countdown window */}
+          <motion.div className="w-full max-w-xs lg:max-w-sm"
+            initial={{ opacity: 0, y: reduce ? 0 : 60 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING, delay: 0.3 }}>
+            <WindowCard logo="event-timer.exe">
+              <div className="p-5">
+                <p className="text-xs font-black uppercase tracking-widest mb-4 text-center"
+                  style={{ fontFamily: 'var(--y2k-font-mono)', color: '#64748B' }}>
+                  ⏳ EVENT STARTS IN
+                </p>
+
+                {/* Timer grid */}
+                <div className="grid grid-cols-4 gap-2 mb-5">
+                  {[{ v: time.days, l: 'DAYS' }, { v: time.hours, l: 'HRS' }, { v: time.minutes, l: 'MIN' }, { v: time.seconds, l: 'SEC' }].map(({ v, l }) => (
+                    <div key={l} className="flex flex-col items-center">
+                      <div className="w-full py-3 text-center font-black text-2xl"
+                        style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', background: '#CCFF00', border: '3px solid #001A6E', letterSpacing: '-0.02em' }}>
+                        {v}
                       </div>
-                      <div className="text-xs uppercase text-purple-300 mt-1 tracking-wide">
-                        {unit.label}
+                      <span className="text-xs font-black mt-1" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#64748B' }}>{l}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Divider */}
+                <div style={{ borderTop: '2px solid #E2E8F0', marginBottom: '1rem' }} />
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { v: '₹15K+', l: 'Prizes', c: '#CCFF00' },
+                    { v: '200+', l: 'Hackers', c: '#00CCFF' },
+                    { v: '20+', l: 'Mentors', c: '#FF44AA' },
+                    { v: '24hr', l: 'Duration', c: '#CCFF00' },
+                  ].map(({ v, l, c }) => (
+                    <div key={l} className="flex items-center gap-2 p-2" style={{ border: '2px solid #001A6E', background: '#F8FAFC' }}>
+                      <div className="w-3 h-3 shrink-0" style={{ background: c, border: '1.5px solid #001A6E' }} />
+                      <div>
+                        <div className="font-black text-base leading-none" style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>{v}</div>
+                        <div className="text-xs" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-mono)' }}>{l}</div>
                       </div>
                     </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-              
-              {/* Status indicator */}
-              <motion.div 
-                className="flex items-center justify-center gap-2 text-purple-300"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: shouldReduceMotion ? 0.3 : 0.8, delay: shouldReduceMotion ? 0.5 : 2.2 }}
-              >
-                <motion.div 
-                  className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-pulse"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: shouldReduceMotion ? 0.2 : 0.5, delay: shouldReduceMotion ? 0.5 : 2.3 }}
-                  style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-                />
-                <span className="text-xs font-mono">LIVE</span>
-              </motion.div>
-            </motion.div>
+                  ))}
+                </div>
+              </div>
+            </WindowCard>
+
+            {/* Feature pills below */}
+            <div className="flex gap-2 mt-4 flex-wrap">
+              {FEATURES.map(({ icon: Icon, label, sub, color }) => (
+                <div key={sub} className="flex items-center gap-2 px-3 py-2"
+                  style={{ background: color, border: '3px solid #001A6E', boxShadow: '3px 3px 0px #001A6E' }}>
+                  <Icon size={14} strokeWidth={3} color="#001A6E" />
+                  <span className="font-black text-xs" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>{label} <span className="font-normal">{sub}</span></span>
+                </div>
+              ))}
+            </div>
           </motion.div>
+        </div>
+
+        {/* Scroll indicator */}
+        <motion.div className="relative z-10 flex justify-center pb-8 gap-2 items-center"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+          <div className="w-2 h-2" style={{ background: '#CCFF00', border: '2px solid #001A6E' }} />
+          <span className="text-xs font-black uppercase tracking-widest" style={{ fontFamily: 'var(--y2k-font-mono)' }}>scroll_down.exe</span>
+          <div className="w-2 h-2" style={{ background: '#CCFF00', border: '2px solid #001A6E' }} />
         </motion.div>
-        
-        {/* Bottom decorative elements */}
-        <motion.div 
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex items-center gap-2 text-purple-400/60"
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.6 : 2.5 }}
-          style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-        >
-          <motion.div 
-            className="w-8 h-px bg-purple-500/50"
-            initial={{ width: shouldReduceMotion ? 32 : 0 }}
-            animate={{ width: 32 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.6 : 2.7 }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'width' }}
-          />
-          <motion.div 
-            className="w-2 h-2 border border-purple-500/50 rounded-full animate-pulse"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: shouldReduceMotion ? 0.2 : 0.5, delay: shouldReduceMotion ? 0.6 : 2.8 }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'transform' }}
-          />
-          <motion.div 
-            className="w-8 h-px bg-purple-500/50"
-            initial={{ width: shouldReduceMotion ? 32 : 0 }}
-            animate={{ width: 32 }}
-            transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.6 : 2.9 }}
-            style={{ willChange: shouldReduceMotion ? 'auto' : 'width' }}
-          />
-        </motion.div>
-      </motion.div>
-      
-      {/* About Section */}
-      <About />
-      {/* Schedule Timeline Section */}
+      </section>
+
+      {/* Marquee */}
+      <MarqueeStrip />
+
+      {/* ═══════════ FEATURES ═══════════ */}
+      <section className="relative py-20 px-6 overflow-hidden" style={{ background: '#0044DD' }}>
+        <Watermark />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <motion.div className="mb-12"
+            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+            transition={SPRING} viewport={{ once: true }}>
+            <WindowCard logo="why-codeforge.exe" style={{ maxWidth: '480px' }}>
+              <div className="px-6 py-4">
+                <h2 className="text-5xl md:text-7xl font-black uppercase" style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>
+                  WHY<br />FORGE?
+                </h2>
+              </div>
+            </WindowCard>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: 'Cash Prizes', desc: 'Compete for ₹15,000+ in prizes across multiple categories. Real rewards for real innovation.', color: '#CCFF00' },
+              { title: 'Team Sprint', desc: '2-4 person teams tackling real problems in 24 hours. Collaboration at its finest.', color: '#00CCFF' },
+              { title: '24hr Grind', desc: 'Intense, focused, exhilarating. Build something remarkable in a single day with expert mentors.', color: '#FF44AA' },
+            ].map((card, i) => (
+              <motion.div key={card.title}
+                initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING, delay: i * 0.1 }} viewport={{ once: true }}
+                whileHover={reduce ? {} : { y: -4, transition: { duration: 0.2 } }}>
+                <WindowCard logo={`feature-0${i + 1}.exe`}>
+                  <div className="p-5">
+                    <div className="inline-block px-2 py-1 mb-3 font-black text-xs uppercase"
+                      style={{ background: card.color, border: '2px solid #001A6E', fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </div>
+                    <h3 className="text-3xl font-black uppercase mb-2"
+                      style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>{card.title}</h3>
+                    <p className="text-sm" style={{ color: '#475569', fontFamily: 'var(--y2k-font-ui)' }}>{card.desc}</p>
+                  </div>
+                </WindowCard>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <MarqueeStrip />
+
+      {/* Existing sections */}
+      <div id="about-section"><About /></div>
       <ScheduleTimeline />
-      {/* Rules and FAQ Section */}
-      <RulesAndFAQ />
-      <Footer/>
-    </>
+      <div id="register-section"><RulesAndFAQ /></div>
+      <Footer />
+    </div>
   );
 }
