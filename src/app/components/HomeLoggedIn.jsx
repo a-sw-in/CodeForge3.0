@@ -32,6 +32,8 @@ function StarBurst({ color = '#CCFF00', size = 140, style = {} }) {
 }
 
 export default function HomeLoggedIn({ session }) {
+  const isApproved = Boolean(session?.approved);
+
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 md:px-6 pt-24 md:pt-28 pb-12 md:pb-16" style={{ background: '#0055FF' }}>
       {/* Watermark Background */}
@@ -160,10 +162,10 @@ export default function HomeLoggedIn({ session }) {
             {/* Content */}
             <div className="p-4">
               <p className="text-sm font-bold mb-2" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                Registration: <span className="font-normal"> Confirmed</span>
+                Registration
               </p>
               <p className="text-sm font-bold" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                Status: <span className="font-normal" style={{ color: '#00AA00' }}>Ready</span>
+                Status: <span className="font-normal" style={{ color: isApproved ? '#00AA00' : '#D97706' }}>{isApproved ? 'Ready' : 'Pending'}</span>
               </p>
             </div>
           </motion.div>

@@ -78,6 +78,7 @@ export async function PUT(request) {
     const updateData = {
       team_name: teamData.team_name,
       total_members: teamData.total_members,
+      approved: Boolean(teamData.approved),
       leader_name: teamData.leader_name,
       leader_email: teamData.leader_email,
       leader_year: teamData.leader_year,

@@ -22,7 +22,7 @@ export default function UHackathonLanding() {
           // Validate session against database
           const { data: teamData, error } = await supabase
             .from('teams')
-            .select('team_id, team_name, leader_email, total_members')
+            .select('team_id, team_name, leader_email, total_members, approved')
             .eq('leader_email', parsedSession.leaderEmail)
             .single();
           
@@ -32,7 +32,8 @@ export default function UHackathonLanding() {
               teamId: teamData.team_id,
               teamName: teamData.team_name,
               leaderEmail: teamData.leader_email,
-              totalMembers: teamData.total_members
+              totalMembers: teamData.total_members,
+              approved: Boolean(teamData.approved)
             };
             setSession(updatedSession);
           } else {

@@ -84,6 +84,7 @@ export default function LoginPage() {
         teamName: teamData.team_name,
         leaderEmail: teamData.leader_email,
         totalMembers: teamData.total_members,
+        approved: Boolean(teamData.approved),
       };
       localStorage.setItem('teamSession', JSON.stringify(sessionData));
       window.dispatchEvent(new Event('sessionUpdate'));
@@ -226,6 +227,7 @@ export default function LoginPage() {
         member4_name: members[2]?.name || null,
         member4_email: members[2]?.email || null,
         member4_year: members[2]?.yearOfStudy || null,
+        approved: false,
         created_at: new Date().toISOString(),
       };
       
@@ -242,6 +244,7 @@ export default function LoginPage() {
         teamName: teamName,
         leaderEmail: email,
         totalMembers: parseInt(teamMembers),
+        approved: false,
       };
       localStorage.setItem('teamSession', JSON.stringify(sessionData));
       window.dispatchEvent(new Event('sessionUpdate'));

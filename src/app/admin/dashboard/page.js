@@ -477,6 +477,44 @@ export default function AdminDashboard() {
                     />
                   </div>
 
+                  {/* Approval Status */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase mb-2"
+                      style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                      Approval Status
+                    </label>
+                    <div className="flex items-center gap-3 p-3"
+                      style={{
+                        background: '#F8FAFC',
+                        border: '3px solid #E2E8F0',
+                      }}>
+                      <input
+                        id="approved-checkbox"
+                        type="checkbox"
+                        checked={Boolean(editedTeam?.approved)}
+                        onChange={(e) => handleFieldChange('approved', e.target.checked)}
+                        disabled={!isEditing}
+                        className="w-5 h-5"
+                        style={{ 
+                          accentColor: '#00AA00', 
+                          cursor: isEditing ? 'pointer' : 'not-allowed' 
+                        }}
+                      />
+                      <label
+                        htmlFor="approved-checkbox"
+                        className="text-sm font-bold uppercase"
+                        style={{
+                          fontFamily: 'var(--y2k-font-ui)',
+                          color: Boolean(editedTeam?.approved) ? '#00AA00' : '#D97706',
+                          letterSpacing: '0.06em',
+                          cursor: isEditing ? 'pointer' : 'default',
+                        }}
+                      >
+                        {Boolean(editedTeam?.approved) ? '✓ APPROVED' : '⏱ PENDING APPROVAL'}
+                      </label>
+                    </div>
+                  </div>
+
                   {/* Payment Screenshots */}
                   {(() => {
                     try {
