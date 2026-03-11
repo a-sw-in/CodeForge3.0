@@ -24,21 +24,23 @@ const FloatingDockMobile = ({ items, className }) => {
   return (
     <div className={cn("fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 block md:hidden", className)}>
       <div
-        className="flex items-center gap-2 px-4 py-3 bg-white"
-        style={{ border: '3px solid #001A6E', boxShadow: '4px 4px 0px #001A6E' }}
+        className="flex items-center gap-2 bg-white"
+        style={{ border: '3px solid #001A6E', boxShadow: '4px 4px 0px #001A6E', padding: '0.84rem 1.1rem' }}
       >
         {items.map((item, i) => (
           <a key={item.title} href={item.href}
-            className="flex h-9 w-9 items-center justify-center font-black text-xs"
+            className="flex items-center justify-center font-black text-xs"
             style={{
               background: COLORS[i % COLORS.length],
               border: '2px solid #001A6E',
               boxShadow: '2px 2px 0px #001A6E',
               color: '#001A6E',
+              width: '40px',
+              height: '40px',
             }}
             title={item.title}
           >
-            <div className="h-5 w-5">{item.icon}</div>
+            <div style={{ width: '22px', height: '22px' }}>{item.icon}</div>
           </a>
         ))}
       </div>
@@ -52,12 +54,12 @@ const FloatingDockDesktop = ({ items, className }) => {
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Number.POSITIVE_INFINITY)}
-      className={cn("fixed top-5 left-1/2 transform -translate-x-1/2 z-50 hidden md:flex items-center gap-2 px-5 py-3 bg-white", className)}
-      style={{ border: '3px solid #001A6E', boxShadow: '4px 4px 0px #001A6E' }}
+      className={cn("fixed top-5 left-1/2 transform -translate-x-1/2 z-50 hidden md:flex items-center gap-2 bg-white", className)}
+      style={{ border: '3px solid #001A6E', boxShadow: '4px 4px 0px #001A6E', padding: '0.84rem 1.37rem' }}
     >
       {/* Brand chip */}
-      <div className="flex items-center pr-4 mr-1" style={{ borderRight: '2px solid #E2E8F0' }}>
-        <div className="px-2 py-1 font-black text-sm" style={{ fontFamily: 'var(--y2k-font-display)', background: '#CCFF00', border: '2px solid #001A6E', color: '#001A6E' }}>
+      <div className="flex items-center mr-1" style={{ borderRight: '2px solid #E2E8F0', paddingRight: '1.1rem' }}>
+        <div className="font-black" style={{ fontFamily: 'var(--y2k-font-display)', background: '#CCFF00', border: '2px solid #001A6E', color: '#001A6E', padding: '0.32rem 0.53rem', fontSize: '0.95rem' }}>
           CF 3.0
         </div>
       </div>
@@ -74,10 +76,10 @@ function IconContainer({ mouseX, title, icon, href, colorIndex }) {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 }
     return val - bounds.x - bounds.width / 2
   })
-  const widthTransform = useTransform(distance, [-150, 0, 150], [34, 52, 34])
-  const heightTransform = useTransform(distance, [-150, 0, 150], [34, 52, 34])
-  const widthTransformIcon = useTransform(distance, [-150, 0, 150], [16, 26, 16])
-  const heightTransformIcon = useTransform(distance, [-150, 0, 150], [16, 26, 16])
+  const widthTransform = useTransform(distance, [-150, 0, 150], [38, 58, 38])
+  const heightTransform = useTransform(distance, [-150, 0, 150], [38, 58, 38])
+  const widthTransformIcon = useTransform(distance, [-150, 0, 150], [18, 28, 18])
+  const heightTransformIcon = useTransform(distance, [-150, 0, 150], [18, 28, 18])
   const width = useSpring(widthTransform, { mass: 0.1, stiffness: 150, damping: 12 })
   const height = useSpring(heightTransform, { mass: 0.1, stiffness: 150, damping: 12 })
   const widthIcon = useSpring(widthTransformIcon, { mass: 0.1, stiffness: 150, damping: 12 })

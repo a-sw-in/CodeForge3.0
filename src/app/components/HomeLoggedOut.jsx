@@ -183,10 +183,10 @@ export default function HomeLoggedOut() {
         <PixelCursor size={80} style={{ position: 'absolute', bottom: '18%', right: '28%', zIndex: 2, filter: 'drop-shadow(4px 4px 0px #001A6E)', display: 'none' }} />
 
         {/* Content */}
-        <div className="relative z-10 flex-1 max-w-6xl mx-auto w-full flex flex-col lg:flex-row items-center gap-8 px-4 sm:px-6 py-10 sm:py-16 lg:py-0">
+        <div className="relative z-10 flex-1 max-w-9xl mx-auto w-full flex flex-col lg:flex-row items-center gap-8 px-4 sm:px-6 py-10 sm:py-16 lg:py-0">
 
           {/* LEFT: Main window card */}
-          <motion.div className="flex-1 w-full max-w-xl"
+          <motion.div className="flex-1 mb-[7vh] mt-[4vh] w-full ml-[7vw] max-w-xl"
             initial={{ opacity: 0, y: reduce ? 0 : 60 }} animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.15 }}>
             <WindowCard logo="codeforge™">
@@ -235,7 +235,7 @@ export default function HomeLoggedOut() {
           </motion.div>
 
           {/* RIGHT: Countdown window */}
-          <motion.div className="w-full max-w-xs lg:max-w-sm"
+          <motion.div className="w-full max-w-xs ml-[12vw] lg:max-w-sm"
             initial={{ opacity: 0, y: reduce ? 0 : 60 }} animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.3 }}>
             <WindowCard logo="event-timer.exe">
@@ -270,7 +270,7 @@ export default function HomeLoggedOut() {
                         <div className="w-3 h-3 shrink-0" style={{ background: c, border: '1.5px solid #001A6E' }} />
                         <div>
                           <div className="font-black text-base leading-none" style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>{value}</div>
-                          <div className="text-xs" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-mono)' }}>{label}</div>
+                          <div className="text-[8px]" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-mono)' }}>{label}</div>
                         </div>
                       </div>
                     );

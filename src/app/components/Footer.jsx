@@ -40,8 +40,8 @@ const Footer = () => {
               style={{ background: '#FF44AA', fontFamily: 'var(--y2k-font-mono)', color: '#FFFFFF' }}>
               {event.organizer} × {event.coOrganizer}
             </div>
-            <h2 className="text-7xl sm:text-8xl md:text-[130px] font-black uppercase leading-none"
-              style={{ fontFamily: 'var(--y2k-font-display)', color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: '0.88' }}>
+            <h2 className="text-6xl sm:text-8xl md:text-[130px] font-black uppercase leading-none"
+              style={{ fontFamily: 'var(--y2k-font-display)', color: '#FFFFFF', letterSpacing: '-0.03em', lineHeight: '1' }}>
               CODE<br />FORGE<br />
               <span style={{ color: '#CCFF00' }}>3.0</span>
             </h2>
@@ -51,7 +51,7 @@ const Footer = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.15 }} viewport={{ once: true }}
-            className="w-full lg:w-auto shrink-0">
+            className="w-full ml-[9vw] lg:w-auto shrink-0">
             <div style={{ border: '3px solid #CCFF00', background: '#ffffffff', boxShadow: '6px 6px 0px rgba(255,255,255,0.3)' }}>
               <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '3px solid #001A6E', background: '#CCFF00' }}>
                 <span className="font-black text-xs uppercase tracking-widest" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>register.exe</span>

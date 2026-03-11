@@ -1,6 +1,6 @@
 'use client';
 
-import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans, Press_Start_2P } from "next/font/google";
 import "./globals.css";
 import LoadingWrapper from "../ui/LoadingWrapper";
 import FloatingDockDemo from "../ui/floating-demo";
@@ -18,6 +18,12 @@ const plusJakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600"],
 });
 
+const pressStart2P = Press_Start_2P({
+  variable: "--font-press-start",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
@@ -25,7 +31,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} ${plusJakarta.variable} antialiased`}
+        className={`${pressStart2P.variable} ${outfit.variable} ${plusJakarta.variable} antialiased`}
         style={{ background: '#FFFDF5' }}
       >
         {!isAdminRoute && <FloatingDockDemo />}

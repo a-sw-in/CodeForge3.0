@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -20,8 +21,8 @@
   --pg-card: #FFFFFF;
   --pg-ring: #8B5CF6;
 
-  --pg-font-heading: 'Outfit', system-ui, sans-serif;
-  --pg-font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --pg-font-heading: 'Press Start 2P', 'Outfit', system-ui, sans-serif;
+  --pg-font-body: 'Press Start 2P', 'Plus Jakarta Sans', system-ui, sans-serif;
 
   --pg-radius-sm: 8px;
   --pg-radius-md: 16px;
@@ -44,9 +45,9 @@
   --y2k-white: #FFFFFF;
   --y2k-window-bar: #CCFF00;
   --y2k-border: 3px solid #001A6E;
-  --y2k-font-display: 'Bebas Neue', 'Space Grotesk', system-ui, sans-serif;
-  --y2k-font-ui: 'Space Grotesk', system-ui, sans-serif;
-  --y2k-font-mono: 'Space Mono', monospace;
+  --y2k-font-display: 'Press Start 2P', 'Bebas Neue', 'Space Grotesk', system-ui, sans-serif;
+  --y2k-font-ui: 'Press Start 2P', 'Space Grotesk', system-ui, sans-serif;
+  --y2k-font-mono: 'Press Start 2P', 'Space Mono', monospace;
 }
 
 @theme inline {
@@ -63,10 +64,14 @@
   }
 }
 
+* {
+  font-family: var(--font-press-start), 'Press Start 2P', cursive;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-press-start), 'Press Start 2P', Arial, Helvetica, sans-serif;
 }
 
 /* Loading screen animations */

@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconHash } from '@tabler/icons-react';
+import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconHash, IconUpload, IconX } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const shouldReduceMotion = useReducedMotion();
   const router = useRouter();
   
-  const [step, setStep] = useState('email'); // 'email', 'login', 'register', 'team-members'
+  const [step, setStep] = useState('email'); // 'email', 'login', 'register', 'team-members', 'payment'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -22,6 +22,8 @@ export default function LoginPage() {
   const [currentMemberData, setCurrentMemberData] = useState({ name: '', email: '', yearOfStudy: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentScreenshots, setPaymentScreenshots] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
@@ -109,8 +111,8 @@ export default function LoginPage() {
       setCurrentMemberIndex(0);
       setAdditionalMembers([]);
     } else {
-      // No additional members, complete registration
-      await completeRegistration();
+      // No additional members, move to payment step
+      setStep('payment');
     }
   };
 
@@ -130,8 +132,8 @@ export default function LoginPage() {
       setCurrentMemberIndex(currentMemberIndex + 1);
       setCurrentMemberData({ name: '', email: '', yearOfStudy: '' });
     } else {
-      // All members added, complete registration
-      completeRegistration(updatedMembers);
+      // All members added, move to payment step
+      setStep('payment');
     }
   };
 
@@ -155,6 +157,49 @@ export default function LoginPage() {
         throw new Error('This email is already registered. Please use the login option.');
       }
 
+      // Upload payment screenshots to Supabase Storage
+      const payment_screenshot_urls = [];
+      if (paymentScreenshots.length > 0) {
+        for (let i = 0; i < paymentScreenshots.length; i++) {
+          const file = paymentScreenshots[i];
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${crypto.randomUUID()}.${fileExt}`;
+          const filePath = `payment-screenshots/${fileName}`;
+
+          console.log(`Uploading screenshot ${i + 1}:`, fileName);
+
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('hackathon-files')
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (uploadError) {
+            console.error('Upload error details:', uploadError);
+            
+            // Provide specific error messages
+            if (uploadError.message.includes('not found')) {
+              throw new Error('Storage bucket not configured. Please contact admin to set up storage.');
+            } else if (uploadError.message.includes('already exists')) {
+              throw new Error(`File conflict. Please try again.`);
+            } else if (uploadError.message.includes('not allowed') || uploadError.message.includes('policy')) {
+              throw new Error('Storage permissions not configured. Please contact admin.');
+            } else {
+              throw new Error(`Failed to upload screenshot ${i + 1}: ${uploadError.message}`);
+            }
+          }
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('hackathon-files')
+            .getPublicUrl(filePath);
+          
+          payment_screenshot_urls.push(publicUrl);
+          console.log(`Screenshot ${i + 1} uploaded successfully:`, publicUrl);
+        }
+      }
+
       // Generate a unique team ID
       const teamId = crypto.randomUUID();
       
@@ -164,6 +209,7 @@ export default function LoginPage() {
         team_name: teamName,
         total_members: parseInt(teamMembers),
         password: password,
+        payment_screenshot_urls: JSON.stringify(payment_screenshot_urls),
         // Leader (Member 1)
         leader_name: name,
         leader_email: email,
@@ -209,7 +255,17 @@ export default function LoginPage() {
   };
 
   const handleBack = () => {
-    if (step === 'team-members') {
+    if (step === 'payment') {
+      // Go back from payment to previous step
+      const totalMembers = parseInt(teamMembers);
+      if (totalMembers > 1) {
+        setStep('team-members');
+        // Reset to last team member
+        setCurrentMemberIndex(additionalMembers.length - 1);
+      } else {
+        setStep('register');
+      }
+    } else if (step === 'team-members') {
       if (currentMemberIndex > 0) {
         // Go back to previous team member
         setCurrentMemberIndex(currentMemberIndex - 1);
@@ -233,88 +289,140 @@ export default function LoginPage() {
       setAdditionalMembers([]);
       setCurrentMemberIndex(0);
       setCurrentMemberData({ name: '', email: '', yearOfStudy: '' });
+      setPaymentScreenshots([]);
     }
   };
 
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    
+    if (paymentScreenshots.length === 0) {
+      setError('Please upload at least one payment screenshot');
+      return;
+    }
+    
+    await completeRegistration();
+  };
+
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center px-4 text-white overflow-hidden">
-      {/* Animated background shapes - matching home page */}
+    <div className="relative w-full min-h-screen flex items-center justify-center px-4 overflow-hidden" style={{ background: '#0055FF' }}>
+      {/* Y2K Animated background shapes */}
       <motion.div 
         className="absolute inset-0 overflow-hidden pointer-events-none"
         initial={{ opacity: 0 }}
-        animate={{ opacity: shouldReduceMotion ? 0.3 : 1 }}
-        transition={{ duration: shouldReduceMotion ? 0.5 : 2, delay: shouldReduceMotion ? 0.2 : 0.8 }}
+        animate={{ opacity: shouldReduceMotion ? 0.4 : 0.6 }}
+        transition={{ duration: shouldReduceMotion ? 0.5 : 1 }}
       >
         <motion.div 
-          className="absolute top-20 left-10 w-32 h-32 border border-purple-500/30 rounded-full animate-pulse"
+          className="absolute top-20 left-10 w-32 h-32 border-4 rounded-full"
+          style={{ borderColor: '#CCFF00' }}
           initial={{ scale: 0, rotate: shouldReduceMotion ? 0 : -180 }}
-          animate={{ scale: shouldReduceMotion ? 1 : 1, rotate: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : 1.5, delay: shouldReduceMotion ? 0.2 : 1, ease: "easeOut" }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: shouldReduceMotion ? 0.3 : 1.5, delay: shouldReduceMotion ? 0.2 : 0.5, ease: "easeOut" }}
         />
         <motion.div 
-          className="absolute top-40 right-20 w-20 h-20 border border-purple-400/40 rounded-full animate-ping"
+          className="absolute top-40 right-20 w-20 h-20 border-4 rounded-full"
+          style={{ borderColor: '#FFFFFF' }}
           initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : 1.2, delay: shouldReduceMotion ? 0.2 : 1.2, ease: "easeOut" }}
+          animate={{ scale: 1, opacity: 0.8 }}
+          transition={{ duration: shouldReduceMotion ? 0.3 : 1.2, delay: shouldReduceMotion ? 0.2 : 0.7, ease: "easeOut" }}
         />
         <motion.div 
-          className="absolute bottom-40 left-20 w-16 h-16 bg-purple-600/20 rounded-full animate-bounce"
+          className="absolute bottom-40 left-20 w-16 h-16 rounded-full"
+          style={{ background: '#CCFF00' }}
           initial={{ y: shouldReduceMotion ? 0 : 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.2 : 1.4, ease: "easeOut" }}
+          animate={{ y: 0, opacity: 0.7 }}
+          transition={{ duration: shouldReduceMotion ? 0.3 : 1, delay: shouldReduceMotion ? 0.2 : 0.9, ease: "easeOut" }}
         />
         <motion.div 
-          className="absolute top-60 right-10 w-24 h-24 border border-purple-300/30 transform rotate-45 animate-spin" 
-          style={{animationDuration: shouldReduceMotion ? '40s' : '20s'}}
+          className="absolute top-60 right-10 w-24 h-24 border-4 transform rotate-45"
+          style={{ borderColor: '#001A6E' }}
           initial={{ scale: 0, rotate: 45 }}
           animate={{ scale: 1, rotate: 45 }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : 1.3, delay: shouldReduceMotion ? 0.2 : 1.6, ease: "easeOut" }}
+          transition={{ duration: shouldReduceMotion ? 0.3 : 1.3, delay: shouldReduceMotion ? 0.2 : 1.1, ease: "easeOut" }}
         />
         <motion.div 
-          className="absolute bottom-60 right-40 w-12 h-12 border border-purple-500/40 transform rotate-12 animate-pulse"
+          className="absolute bottom-60 right-40 w-12 h-12 border-4 transform rotate-12"
+          style={{ borderColor: '#CCFF00' }}
           initial={{ scale: 0, rotate: 12 }}
           animate={{ scale: 1, rotate: 12 }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : 1.1, delay: shouldReduceMotion ? 0.2 : 1.8, ease: "easeOut" }}
+          transition={{ duration: shouldReduceMotion ? 0.3 : 1.1, delay: shouldReduceMotion ? 0.2 : 1.3, ease: "easeOut" }}
         />
       </motion.div>
 
-      {/* Login Form Container */}
+      {/* Login Form Container - Y2K Window Style */}
       <motion.div
         className="relative z-10 w-full max-w-md"
         initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 50, scale: shouldReduceMotion ? 1 : 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: shouldReduceMotion ? 0.4 : 1.2, delay: shouldReduceMotion ? 0.1 : 0.5 }}
+        transition={{ duration: shouldReduceMotion ? 0.4 : 0.8, delay: shouldReduceMotion ? 0.1 : 0.3 }}
       >
         <motion.div
-          className="bg-purple-900/80 backdrop-blur-lg rounded-3xl border border-purple-500/40 p-8 shadow-2xl"
+          className="flex flex-col"
           style={{
-            boxShadow: '0 0 40px rgba(134, 26, 133, 0.5), 0 0 80px rgba(81, 47, 141, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            border: '3px solid #001A6E',
+            background: '#FFFFFF',
+            boxShadow: '8px 8px 0px #001A6E',
           }}
         >
           {/* Header */}
-          <motion.div
-            className="text-center mb-8"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: shouldReduceMotion ? 0.1 : 0.7 }}
-          >
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-200 via-purple-100 to-purple-300 bg-clip-text text-transparent mb-2">
-              {step === 'email' ? 'Welcome' : step === 'login' ? 'Welcome Back' : step === 'team-members' ? 'Add Team Members' : 'Create Account'}
-            </h1>
-            <p className="text-purple-300 text-sm">
-              {step === 'email' ? 'Enter your email to continue' : step === 'login' ? 'Enter your password to login' : step === 'team-members' ? `Team Member ${currentMemberIndex + 1} of ${parseInt(teamMembers) - 1}` : 'Complete your registration'}
-            </p>
-          </motion.div>
+          {/* Y2K Window Title Bar */}
+          <div className="flex items-center justify-between px-4 py-2 shrink-0"
+            style={{ background: '#CCFF00', borderBottom: '3px solid #001A6E' }}>
+            <span className="font-bold text-sm uppercase tracking-wide" 
+              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
+              {step === 'email' ? '⚡ Welcome' : step === 'login' ? '🔐 Login' : step === 'team-members' ? '👥 Team Members' : step === 'payment' ? '💳 Payment' : '📝 Register'}
+            </span>
+            <div className="flex items-center justify-center w-5 h-5"
+              style={{ background: '#FFFFFF', border: '2px solid #001A6E' }}>
+              <span className="text-xs font-bold" style={{ color: '#001A6E' }}>✕</span>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <div className="p-6" style={{ background: '#FFFFFF' }}>
+            {/* Subtitle */}
+            <motion.div className="text-center mb-6"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: shouldReduceMotion ? 0.1 : 0.4 }}
+            >
+              <p className="text-sm font-medium uppercase tracking-wide" 
+                style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                {step === 'email' ? 'Enter your email to continue' : 
+                 step === 'login' ? 'Enter your password' : 
+                 step === 'team-members' ? `Member ${currentMemberIndex + 2} of ${teamMembers}` : 
+                 step === 'payment' ? 'Upload payment confirmation screenshots' :
+                 'Complete your registration'}
+              </p>
+            </motion.div>
 
           {/* Error Message */}
           {error && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 p-4 bg-red-500/20 border border-red-500/40 rounded-xl flex items-center gap-3"
+              className="mb-4 p-3"
+              style={{ 
+                background: '#FFE6E6', 
+                border: '3px solid #FF0000',
+                boxShadow: '4px 4px 0px #001A6E'
+              }}
             >
-              <IconAlertCircle className="w-5 h-5 text-red-400" />
-              <span className="text-red-300 text-sm">{error}</span>
+              <div className="flex items-start gap-2">
+                <IconAlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#FF0000' }} />
+                <div className="flex-1">
+                  <span className="text-sm font-medium block" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                    {error}
+                  </span>
+                  {error.includes('Storage bucket') && (
+                    <span className="text-xs block mt-1" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#64748B' }}>
+                      Admin: Check STORAGE_SETUP.md for configuration instructions.
+                    </span>
+                  )}
+                </div>
+              </div>
             </motion.div>
           )}
 
@@ -328,11 +436,12 @@ export default function LoginPage() {
               transition={{ duration: 0.3 }}
             >
               <div className="mb-6">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+                <label className="block text-sm font-bold uppercase mb-2" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Email Address
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
                     <IconMail className="w-5 h-5" />
                   </div>
                   <input
@@ -340,9 +449,18 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-11 pr-4 py-2.5 text-sm font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     placeholder="you@example.com"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '4px 4px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
@@ -350,12 +468,22 @@ export default function LoginPage() {
               <motion.button
                 type="submit"
                 disabled={loading}
-                whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium py-3 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20"
+                className="w-full px-6 py-3 font-bold uppercase text-sm flex items-center justify-center gap-2"
+                style={{
+                  fontFamily: 'var(--y2k-font-ui)',
+                  background: '#CCFF00',
+                  color: '#001A6E',
+                  border: '3px solid #001A6E',
+                  letterSpacing: '0.08em',
+                  boxShadow: '4px 4px 0px #001A6E',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.6 : 1,
+                }}
+                whileHover={!loading ? { x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' } : {}}
+                whileTap={!loading ? { x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' } : {}}
               >
                 {loading ? 'Checking...' : 'Continue'}
-                <IconArrowRight className="w-5 h-5" />
+                <IconArrowRight className="w-5 h-5" strokeWidth={3} />
               </motion.button>
             </motion.form>
           )}
@@ -370,28 +498,36 @@ export default function LoginPage() {
               transition={{ duration: 0.3 }}
             >
               <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+                <label className="block text-sm font-bold uppercase mb-2" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Email Address
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#64748B' }}>
                     <IconMail className="w-5 h-5" />
                   </div>
                   <input
                     type="email"
                     value={email}
                     readOnly
-                    className="w-full bg-purple-800/20 border border-purple-500/20 rounded-xl pl-12 pr-4 py-3 text-purple-200 cursor-not-allowed"
+                    className="w-full pl-11 pr-4 py-2.5 text-sm font-medium cursor-not-allowed"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#F1F5F9',
+                      color: '#64748B',
+                      border: '3px solid #CBD5E1',
+                    }}
                   />
                 </div>
               </div>
 
               <div className="mb-6">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+                <label className="block text-sm font-bold uppercase mb-2" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
                     <IconLock className="w-5 h-5" />
                   </div>
                   <input
@@ -399,9 +535,18 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                    placeholder="Enter your password"
+                    className="w-full pl-11 pr-4 py-2.5 text-sm font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
+                    placeholder="Enter password"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '4px 4px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
@@ -410,19 +555,36 @@ export default function LoginPage() {
                 <motion.button
                   type="button"
                   onClick={handleBack}
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                  className="bg-purple-800/30 border border-purple-500/30 text-purple-200 font-medium py-3 px-6 rounded-xl transition-all flex items-center gap-2 hover:bg-purple-800/50"
+                  className="px-5 py-2.5 font-bold uppercase text-sm flex items-center gap-2"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#FFFFFF',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                  }}
+                  whileHover={{ x: -2, y: -2, boxShadow: '4px 4px 0px #CBD5E1' }}
+                  whileTap={{ x: 1, y: 1, boxShadow: 'none' }}
                 >
-                  <IconArrowLeft className="w-5 h-5" />
+                  <IconArrowLeft className="w-4 h-4" strokeWidth={3} />
                   Back
                 </motion.button>
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20"
+                  className="flex-1 px-6 py-2.5 font-bold uppercase text-sm"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#CCFF00',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                    boxShadow: '4px 4px 0px #001A6E',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.6 : 1,
+                  }}
+                  whileHover={!loading ? { x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' } : {}}
+                  whileTap={!loading ? { x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' } : {}}
                 >
                   {loading ? 'Logging in...' : 'Login'}
                 </motion.button>
@@ -439,118 +601,166 @@ export default function LoginPage() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Email Address
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconMail className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#64748B' }}>
+                    <IconMail className="w-4 h-4" />
                   </div>
                   <input
                     type="email"
                     value={email}
                     readOnly
-                    className="w-full bg-purple-800/20 border border-purple-500/20 rounded-xl pl-12 pr-4 py-3 text-purple-200 cursor-not-allowed"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium cursor-not-allowed"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#F1F5F9',
+                      color: '#64748B',
+                      border: '3px solid #CBD5E1',
+                    }}
                   />
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Full Name
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconUser className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconUser className="w-4 h-4" />
                   </div>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     placeholder="John Doe"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Team Name
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconUsers className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconUsers className="w-4 h-4" />
                   </div>
                   <input
                     type="text"
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     placeholder="Team Phoenix"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
-                  Number of Team Members
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
+                  Team Members
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconHash className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconHash className="w-4 h-4" />
                   </div>
                   <select
                     value={teamMembers}
                     onChange={(e) => setTeamMembers(e.target.value)}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   >
-                    <option value="" className="bg-purple-900">Select team size...</option>
-                    <option value="2" className="bg-purple-900">2 Members</option>
-                    <option value="3" className="bg-purple-900">3 Members</option>
-                    <option value="4" className="bg-purple-900">4 Members</option>
+                    <option value="" style={{ background: '#FFFFFF', color: '#001A6E' }}>Select team size...</option>
+                    <option value="2" style={{ background: '#FFFFFF', color: '#001A6E' }}>2 Members</option>
+                    <option value="3" style={{ background: '#FFFFFF', color: '#001A6E' }}>3 Members</option>
+                    <option value="4" style={{ background: '#FFFFFF', color: '#001A6E' }}>4 Members</option>
                   </select>
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Year of Study
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconSchool className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconSchool className="w-4 h-4" />
                   </div>
                   <select
                     value={yearOfStudy}
                     onChange={(e) => setYearOfStudy(e.target.value)}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   >
-                    <option value="" className="bg-purple-900">Select year...</option>
-                    <option value="1st Year" className="bg-purple-900">1st Year</option>
-                    <option value="2nd Year" className="bg-purple-900">2nd Year</option>
-                    <option value="3rd Year" className="bg-purple-900">3rd Year</option>
-                    <option value="4th Year" className="bg-purple-900">4th Year</option>
-                    <option value="Graduate" className="bg-purple-900">Graduate</option>
+                    <option value="" style={{ background: '#FFFFFF', color: '#001A6E' }}>Select year...</option>
+                    <option value="1st Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>1st Year</option>
+                    <option value="2nd Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>2nd Year</option>
+                    <option value="3rd Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>3rd Year</option>
+                    <option value="4th Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>4th Year</option>
+                    <option value="Graduate" style={{ background: '#FFFFFF', color: '#001A6E' }}>Graduate</option>
                   </select>
                 </div>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-5">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Password
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconLock className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconLock className="w-4 h-4" />
                   </div>
                   <input
                     type="password"
@@ -558,33 +768,59 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
-                    placeholder="Create a password (min 6 characters)"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
+                    placeholder="Min 6 characters"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <motion.button
                   type="button"
                   onClick={handleBack}
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                  className="bg-purple-800/30 border border-purple-500/30 text-purple-200 font-medium py-3 px-6 rounded-xl transition-all flex items-center gap-2 hover:bg-purple-800/50"
+                  className="px-4 py-2 font-bold uppercase text-xs flex items-center gap-1.5"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#FFFFFF',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                  }}
+                  whileHover={{ x: -2, y: -2, boxShadow: '4px 4px 0px #CBD5E1' }}
+                  whileTap={{ x: 1, y: 1, boxShadow: 'none' }}
                 >
-                  <IconArrowLeft className="w-5 h-5" />
+                  <IconArrowLeft className="w-3.5 h-3.5" strokeWidth={3} />
                   Back
                 </motion.button>
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 font-bold uppercase text-xs flex items-center justify-center gap-1.5"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#CCFF00',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                    boxShadow: '4px 4px 0px #001A6E',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.6 : 1,
+                  }}
+                  whileHover={!loading ? { x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' } : {}}
+                  whileTap={!loading ? { x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' } : {}}
                 >
-                  {parseInt(teamMembers) > 1 ? 'Next: Add Team Members' : 'Create Account'}
-                  <IconArrowRight className="w-5 h-5" />
+                  {parseInt(teamMembers) > 1 ? 'Next: Team' : 'Next: Payment'}
+                  <IconArrowRight className="w-3.5 h-3.5" strokeWidth={3} />
                 </motion.button>
               </div>
             </motion.form>
@@ -599,138 +835,345 @@ export default function LoginPage() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="mb-6">
-                <div className="bg-purple-800/20 border border-purple-500/20 rounded-xl p-4 mb-4">
-                  <p className="text-purple-200 text-sm">
-                    <span className="font-semibold">Team:</span> {teamName}
+              <div className="mb-4">
+                <div className="p-3 mb-3"
+                  style={{ 
+                    background: '#F0F9FF', 
+                    border: '3px solid #0055FF',
+                    boxShadow: '3px 3px 0px #001A6E'
+                  }}>
+                  <p className="text-xs font-bold uppercase" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                    Team: {teamName}
                   </p>
-                  <p className="text-purple-300 text-xs mt-1">
-                    Adding member {currentMemberIndex + 2} of {teamMembers}
+                  <p className="text-xs mt-1" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#64748B' }}>
+                    Member {currentMemberIndex + 2} of {teamMembers}
                   </p>
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Member Name
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconUser className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconUser className="w-4 h-4" />
                   </div>
                   <input
                     type="text"
                     value={currentMemberData.name}
                     onChange={(e) => setCurrentMemberData({ ...currentMemberData, name: e.target.value })}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     placeholder="Jane Doe"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Member Email
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconMail className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconMail className="w-4 h-4" />
                   </div>
                   <input
                     type="email"
                     value={currentMemberData.email}
                     onChange={(e) => setCurrentMemberData({ ...currentMemberData, email: e.target.value })}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 placeholder-purple-400 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     placeholder="jane@example.com"
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-purple-200 text-sm font-medium mb-2">
+              <div className="mb-5">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Year of Study
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-400">
-                    <IconSchool className="w-5 h-5" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconSchool className="w-4 h-4" />
                   </div>
                   <select
                     value={currentMemberData.yearOfStudy}
                     onChange={(e) => setCurrentMemberData({ ...currentMemberData, yearOfStudy: e.target.value })}
                     required
-                    className="w-full bg-purple-800/30 border border-purple-500/30 rounded-xl pl-12 pr-4 py-3 text-purple-100 focus:outline-none focus:border-purple-400/60 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
                     disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   >
-                    <option value="" className="bg-purple-900">Select year...</option>
-                    <option value="1st Year" className="bg-purple-900">1st Year</option>
-                    <option value="2nd Year" className="bg-purple-900">2nd Year</option>
-                    <option value="3rd Year" className="bg-purple-900">3rd Year</option>
-                    <option value="4th Year" className="bg-purple-900">4th Year</option>
-                    <option value="Graduate" className="bg-purple-900">Graduate</option>
+                    <option value="" style={{ background: '#FFFFFF', color: '#001A6E' }}>Select year...</option>
+                    <option value="1st Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>1st Year</option>
+                    <option value="2nd Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>2nd Year</option>
+                    <option value="3rd Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>3rd Year</option>
+                    <option value="4th Year" style={{ background: '#FFFFFF', color: '#001A6E' }}>4th Year</option>
+                    <option value="Graduate" style={{ background: '#FFFFFF', color: '#001A6E' }}>Graduate</option>
                   </select>
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <motion.button
                   type="button"
                   onClick={handleBack}
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                  className="bg-purple-800/30 border border-purple-500/30 text-purple-200 font-medium py-3 px-6 rounded-xl transition-all flex items-center gap-2 hover:bg-purple-800/50"
+                  className="px-4 py-2 font-bold uppercase text-xs flex items-center gap-1.5"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#FFFFFF',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                  }}
+                  whileHover={{ x: -2, y: -2, boxShadow: '4px 4px 0px #CBD5E1' }}
+                  whileTap={{ x: 1, y: 1, boxShadow: 'none' }}
                 >
-                  <IconArrowLeft className="w-5 h-5" />
+                  <IconArrowLeft className="w-3.5 h-3.5" strokeWidth={3} />
                   Back
                 </motion.button>
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: shouldReduceMotion ? 1 : 1.02 }}
-                  whileTap={{ scale: shouldReduceMotion ? 1 : 0.98 }}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 font-bold uppercase text-xs flex items-center justify-center gap-1.5"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#CCFF00',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                    boxShadow: '4px 4px 0px #001A6E',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.6 : 1,
+                  }}
+                  whileHover={!loading ? { x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' } : {}}
+                  whileTap={!loading ? { x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' } : {}}
                 >
-                  {loading ? 'Saving...' : currentMemberIndex + 1 < parseInt(teamMembers) - 1 ? 'Next Member' : 'Complete Registration'}
-                  <IconArrowRight className="w-5 h-5" />
+                  {loading ? 'Saving...' : currentMemberIndex + 1 < parseInt(teamMembers) - 1 ? 'Next Member' : 'Next: Payment'}
+                  <IconArrowRight className="w-3.5 h-3.5" strokeWidth={3} />
+                </motion.button>
+              </div>
+            </motion.form>
+          )}
+
+          {/* Payment Step */}
+          {step === 'payment' && (
+            <motion.form
+              onSubmit={handlePaymentSubmit}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mb-5">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
+                  Payment Screenshots
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files);
+                      setPaymentScreenshots([...paymentScreenshots, ...files]);
+                    }}
+                    id="payment-upload"
+                    className="hidden"
+                    disabled={loading}
+                  />
+                  <label
+                    htmlFor="payment-upload"
+                    className="w-full px-3 py-2 text-xs font-medium cursor-pointer flex items-center gap-2"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: paymentScreenshots.length > 0 ? '#CCFF00' : '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
+                  >
+                    <IconUpload className="w-4 h-4" />
+                    <span className="flex-1">
+                      {paymentScreenshots.length > 0 
+                        ? `${paymentScreenshots.length} file(s) selected` 
+                        : 'Upload payment screenshots (multiple)'}
+                    </span>
+                  </label>
+                </div>
+                {paymentScreenshots.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {paymentScreenshots.map((file, index) => (
+                      <div 
+                        key={index}
+                        className="flex items-center gap-2 px-2 py-1 text-xs"
+                        style={{
+                          background: '#F1F5F9',
+                          border: '2px solid #CBD5E1',
+                          fontFamily: 'var(--y2k-font-ui)',
+                          color: '#001A6E'
+                        }}
+                      >
+                        <span className="flex-1 truncate">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPaymentScreenshots(paymentScreenshots.filter((_, i) => i !== index));
+                          }}
+                          className="p-1 hover:bg-red-500 hover:text-white rounded"
+                          style={{ color: '#EF4444' }}
+                        >
+                          <IconX className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs mt-1" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-ui)' }}>
+                  Upload one or more screenshots of your payment confirmation
+                </p>
+              </div>
+
+              <div className="flex gap-2">
+                <motion.button
+                  type="button"
+                  onClick={handleBack}
+                  className="px-4 py-2 font-bold uppercase text-xs flex items-center gap-1.5"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#FFFFFF',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                  }}
+                  whileHover={{ x: -2, y: -2, boxShadow: '4px 4px 0px #CBD5E1' }}
+                  whileTap={{ x: 1, y: 1, boxShadow: 'none' }}
+                >
+                  <IconArrowLeft className="w-3.5 h-3.5" strokeWidth={3} />
+                  Back
+                </motion.button>
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 font-bold uppercase text-xs flex items-center justify-center gap-1.5"
+                  style={{
+                    fontFamily: 'var(--y2k-font-ui)',
+                    background: '#CCFF00',
+                    color: '#001A6E',
+                    border: '3px solid #001A6E',
+                    letterSpacing: '0.08em',
+                    boxShadow: '4px 4px 0px #001A6E',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    opacity: loading ? 0.6 : 1,
+                  }}
+                  whileHover={!loading ? { x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' } : {}}
+                  whileTap={!loading ? { x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' } : {}}
+                >
+                  {loading ? 'Completing...' : 'Complete Registration'}
+                  <IconArrowRight className="w-3.5 h-3.5" strokeWidth={3} />
                 </motion.button>
               </div>
             </motion.form>
           )}
 
           {/* Progress Indicator */}
-          <div className="mt-8 flex justify-center gap-2">
+          <div className="mt-6 pt-4 flex justify-center gap-2" style={{ borderTop: '3px solid #E2E8F0' }}>
             <motion.div 
-              className={`h-2 rounded-full transition-all duration-300 ${step === 'email' ? 'bg-purple-400 w-8' : 'bg-purple-600/50 w-2'}`}
-              animate={{ width: step === 'email' ? 32 : 8 }}
+              className={`h-2.5 transition-all duration-300`}
+              style={{ 
+                background: step === 'email' ? '#CCFF00' : '#CBD5E1',
+                border: '2px solid #001A6E',
+                width: step === 'email' ? '32px' : '12px'
+              }}
+              animate={{ width: step === 'email' ? 32 : 12 }}
             />
             <motion.div 
-              className={`h-2 rounded-full transition-all duration-300 ${step === 'login' || step === 'register' ? 'bg-purple-400 w-8' : 'bg-purple-600/50 w-2'}`}
-              animate={{ width: step === 'login' || step === 'register' ? 32 : 8 }}
+              className={`h-2.5 transition-all duration-300`}
+              style={{ 
+                background: step === 'login' || step === 'register' ? '#CCFF00' : '#CBD5E1',
+                border: '2px solid #001A6E',
+                width: step === 'login' || step === 'register' ? '32px' : '12px'
+              }}
+              animate={{ width: step === 'login' || step === 'register' ? 32 : 12 }}
             />
             <motion.div 
-              className={`h-2 rounded-full transition-all duration-300 ${step === 'team-members' ? 'bg-purple-400 w-8' : 'bg-purple-600/50 w-2'}`}
-              animate={{ width: step === 'team-members' ? 32 : 8 }}
+              className={`h-2.5 transition-all duration-300`}
+              style={{ 
+                background: step === 'team-members' ? '#CCFF00' : '#CBD5E1',
+                border: '2px solid #001A6E',
+                width: step === 'team-members' ? '32px' : '12px'
+              }}
+              animate={{ width: step === 'team-members' ? 32 : 12 }}
             />
+            <motion.div 
+              className={`h-2.5 transition-all duration-300`}
+              style={{ 
+                background: step === 'payment' ? '#CCFF00' : '#CBD5E1',
+                border: '2px solid #001A6E',
+                width: step === 'payment' ? '32px' : '12px'
+              }}
+              animate={{ width: step === 'payment' ? 32 : 12 }}
+            />
+          </div>
           </div>
         </motion.div>
 
         {/* Back to Home Link */}
         <motion.div
-          className="text-center mt-6"
+          className="text-center mt-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.5 }}
         >
-          <button
+          <motion.button
             onClick={() => router.push('/')}
-            className="text-purple-300 hover:text-purple-200 transition-colors text-sm flex items-center justify-center gap-2 mx-auto"
+            className="inline-flex items-center gap-2 px-5 py-2 font-bold uppercase text-xs"
+            style={{
+              fontFamily: 'var(--y2k-font-ui)',
+              background: '#FFFFFF',
+              color: '#001A6E',
+              border: '3px solid #001A6E',
+              letterSpacing: '0.08em',
+            }}
+            whileHover={{ x: -2, y: -2, boxShadow: '4px 4px 0px #CCFF00' }}
+            whileTap={{ x: 1, y: 1, boxShadow: 'none' }}
           >
-            <IconArrowLeft className="w-4 h-4" />
+            <IconArrowLeft className="w-3.5 h-3.5" strokeWidth={3} />
             Back to Home
-          </button>
+          </motion.button>
         </motion.div>
       </motion.div>
     </div>

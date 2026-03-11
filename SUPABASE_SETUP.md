@@ -58,9 +58,7 @@ CREATE TABLE teams (
   member4_name TEXT,
   member4_email TEXT,
   member4_year TEXT,
-  
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+
 
 -- Create indexes for faster queries
 CREATE INDEX idx_teams_team_id ON teams(team_id);
