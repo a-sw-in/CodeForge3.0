@@ -10,12 +10,12 @@ import {
 
 export default function FloatingDockDemo() {
   const links = [
-    { title: "Home", icon: <IconHome size={20} strokeWidth={2.5} />, href: "#" },
-    { title: "About", icon: <IconInfoCircle size={20} strokeWidth={2.5} />, href: "#about-section" },
-    { title: "Schedule", icon: <IconCalendarEvent size={20} strokeWidth={2.5} />, href: "#schedule" },
-    { title: "Prizes", icon: <IconTrophy size={20} strokeWidth={2.5} />, href: "#prizes" },
-    { title: "FAQ", icon: <IconCode size={20} strokeWidth={2.5} />, href: "#register-section" },
-    { title: "Contact", icon: <IconMail size={20} strokeWidth={2.5} />, href: "#contact" },
+    { title: "Home", icon: <IconHome size={20} strokeWidth={2.5} />, href: "/" },
+    { title: "About", icon: <IconInfoCircle size={20} strokeWidth={2.5} />, href: "/about" },
+    { title: "Schedule", icon: <IconCalendarEvent size={20} strokeWidth={2.5} />, href: "/schedule" },
+    { title: "Prizes", icon: <IconTrophy size={20} strokeWidth={2.5} />, href: "/prizes" },
+    { title: "FAQ", icon: <IconCode size={20} strokeWidth={2.5} />, href: "/faq" },
+    { title: "Contact", icon: <IconMail size={20} strokeWidth={2.5} />, href: "/contact" },
   ]
 
   return <FloatingDock items={links} />

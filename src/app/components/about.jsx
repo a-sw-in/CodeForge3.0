@@ -49,10 +49,7 @@ const About = () => {
           initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
           transition={SPRING} viewport={{ once: true }}>
           <div>
-            <div className="inline-block px-3 py-1 mb-3 text-xs font-black uppercase tracking-widest text-white"
-              style={{ background: '#0055FF', fontFamily: 'var(--y2k-font-mono)' }}>
-              § section_02
-            </div>
+            
             <h2 className="text-6xl sm:text-7xl md:text-[110px] font-black uppercase leading-none"
               style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', lineHeight: '0.9', letterSpacing: '-0.02em' }}>
               ABOUT

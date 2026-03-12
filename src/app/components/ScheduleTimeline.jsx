@@ -11,15 +11,9 @@ export default function ScheduleTimeline() {
   const reduce = useReducedMotion();
 
   return (
-    <section className="relative py-16 md:py-20 px-4 md:px-6 overflow-hidden" style={{ background: '#0044DD' }}>
+    <section className="relative py-16 md:py-20 px-4 md:px-6 overflow-hidden" style={{ background: '##0055FF' }}>
       {/* Watermark */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
-        {Array.from({ length: 8 }).map((_, r) => (
-          <div key={r} style={{ opacity: 0.1, whiteSpace: 'nowrap', fontFamily: 'var(--y2k-font-display)', fontSize: '3rem', fontWeight: 900, color: '#FFFFFF', lineHeight: '1.3' }}>
-            {'SCHEDULE · TIMELINE · CODEFORGE · '}
-          </div>
-        ))}
-      </div>
+      
 
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Header */}
@@ -27,18 +21,11 @@ export default function ScheduleTimeline() {
           initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
           transition={SPRING} viewport={{ once: true }}>
           <div>
-            <div className="inline-block px-3 py-1 mb-3 text-xs font-black uppercase tracking-widest"
-              style={{ background: '#CCFF00', fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>
-              § section_03 — event-schedule
-            </div>
             <h2 className="text-6xl sm:text-7xl md:text-[100px] font-black uppercase leading-none text-white"
               style={{ fontFamily: 'var(--y2k-font-display)', letterSpacing: '-0.02em' }}>
               SCHEDULE
             </h2>
           </div>
-          <p className="text-xs font-black uppercase sm:text-right" style={{ fontFamily: 'var(--y2k-font-mono)', color: 'rgba(255,255,255,0.5)' }}>
-            {schedule.length} EVENTS<br />{data.event.dateDisplay.split(' ')[1]}
-          </p>
         </motion.div>
 
         {/* Ticket stubs */}
