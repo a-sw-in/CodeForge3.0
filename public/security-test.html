@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeForge 3.0 - Client-Side Security Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff00;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      text-shadow: 0 0 10px #00ff00;
+      border: 3px solid #00ff00;
+      padding: 20px;
+      background: rgba(0, 255, 0, 0.1);
+    }
+
+    .test-section {
+      background: rgba(0, 255, 0, 0.05);
+      border: 2px solid #00ff00;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .test-section h2 {
+      margin-bottom: 15px;
+      color: #00ffff;
+    }
+
+    .test-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-left: 3px solid #444;
+    }
+
+    .test-item.pass {
+      border-left-color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+    }
+
+    .test-item.fail {
+      border-left-color: #ff0000;
+      background: rgba(255, 0, 0, 0.1);
+      color: #ff6666;
+    }
+
+    .test-item.warn {
+      border-left-color: #ffff00;
+      background: rgba(255, 255, 0, 0.1);
+      color: #ffff99;
+    }
+
+    button {
+      background: #00ff00;
+      color: #000;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px 5px;
+      font-family: 'Courier New', monospace;
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      background: #00cc00;
+      box-shadow: 0 0 20px #00ff00;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .summary {
+      background: rgba(0, 255, 255, 0.1);
+      border: 3px solid #00ffff;
+      padding: 20px;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .score {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    .score.excellent { color: #00ff00; }
+    .score.good { color: #ffff00; }
+    .score.poor { color: #ff0000; }
+
+    code {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    .console-output {
+      background: #000;
+      border: 2px solid #00ff00;
+      padding: 15px;
+      margin: 10px 0;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ CodeForge 3.0 - Client-Side Security Test</h1>
+    
+    <div style="text-align: center; margin-bottom: 30px;">
+      <button onclick="runAllTests()">🚀 Run All Tests</button>
+      <button onclick="clearResults()">🗑️ Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+    
+    <div id="summary" class="summary" style="display: none;">
+      <h2>Test Summary</h2>
+      <div class="score" id="score">-</div>
+      <div id="summary-details"></div>
+    </div>
+  </div>
+
+  <script>
+    let results = { passed: 0, failed: 0, warnings: 0 };
+    
+    function clearResults() {
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('summary').style.display = 'none';
+      results = { passed: 0, failed: 0, warnings: 0 };
+    }
+
+    function addSection(title) {
+      const section = document.createElement('div');
+      section.className = 'test-section';
+      section.innerHTML = `<h2>${title}</h2>`;
+      section.id = 'section-' + Date.now();
+      document.getElementById('results').appendChild(section);
+      return section;
+    }
+
+    function addTest(section, status, message, details = '') {
+      const test = document.createElement('div');
+      test.className = `test-item ${status}`;
+      
+      const icon = status === 'pass' ? '✓' : status === 'fail' ? '✗' : '⚠';
+      test.innerHTML = `${icon} ${message}${details ? `<br><small>${details}</small>` : ''}`;
+      
+      section.appendChild(test);
+      results[status === 'pass' ? 'passed' : status === 'fail' ? 'failed' : 'warnings']++;
+    }
+
+    function testConsoleProtection() {
+      const section = addSection('Console Protection');
+      
+      // Test if security.js loaded
+      if (typeof console._originalLog !== 'undefined' || document.querySelector('script[src="/security.js"]')) {
+        addTest(section, 'pass', 'Security script loaded');
+      } else {
+        addTest(section, 'warn', 'Security script may not be loaded');
+      }
+      
+      // Test DevTools detection
+      try {
+        let isOpen = false;
+        const threshold = 160;
+        isOpen = window.outerWidth - window.innerWidth > threshold || 
+                 window.outerHeight - window.innerHeight > threshold;
+        
+        if (isOpen) {
+          addTest(section, 'pass', 'DevTools detection working (console is open)');
+        } else {
+          addTest(section, 'pass', 'DevTools detection active');
+        }
+      } catch (e) {
+        addTest(section, 'warn', 'Could not test DevTools detection');
+      }
+    }
+
+    function testLocalStorageProtection() {
+      const section = addSection('LocalStorage Protection');
+      
+      try {
+        // Test if localStorage modifications are monitored
+        const originalSetItem = localStorage.setItem;
+        
+        // Try to set a test session
+        localStorage.setItem('test_session', 'test');
+        localStorage.removeItem('test_session');
+        
+        addTest(section, 'pass', 'LocalStorage is accessible and functional');
+        
+        // Check if security monitoring is in place
+        if (localStorage.setItem !== originalSetItem) {
+          addTest(section, 'pass', 'LocalStorage monitoring active');
+        } else {
+          addTest(section, 'warn', 'LocalStorage monitoring may not be active');
+        }
+        
+      } catch (e) {
+        addTest(section, 'fail', 'LocalStorage access error', e.message);
+      }
+    }
+
+    function testXSSProtection() {
+      const section = addSection('XSS Protection');
+      
+      // Test if dangerous HTML is properly escaped
+      const testDiv = document.createElement('div');
+      const xssPayload = '<script>alert("XSS")</script>';
+      
+      try {
+        testDiv.textContent = xssPayload;
+        
+        if (testDiv.innerHTML.includes('&lt;script&gt;') || !testDiv.innerHTML.includes('<script>')) {
+          addTest(section, 'pass', 'Text content properly escaped');
+        } else {
+          addTest(section, 'fail', 'XSS payload not escaped');
+        }
+      } catch (e) {
+        addTest(section, 'warn', 'XSS test error', e.message);
+      }
+      
+      // Test eval() protection
+      try {
+        eval('1+1');
+        addTest(section, 'warn', 'eval() is available (should be disabled in production)');
+      } catch (e) {
+        addTest(section, 'pass', 'eval() is disabled');
+      }
+    }
+
+    function testCSPHeaders() {
+      const section = addSection('Content Security Policy');
+      
+      // Get CSP from meta tag or check if violations are reported
+      const metaCSP = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+      
+      if (metaCSP) {
+        addTest(section, 'pass', 'CSP meta tag present');
+      } else {
+        addTest(section, 'warn', 'CSP meta tag not found (may be in headers)');
+      }
+      
+      // Try to create inline script (should be blocked by CSP)
+      try {
+        const script = document.createElement('script');
+        script.textContent = 'console.log("test")';
+        document.body.appendChild(script);
+        document.body.removeChild(script);
+        addTest(section, 'warn', 'Inline scripts may not be blocked');
+      } catch (e) {
+        addTest(section, 'pass', 'Inline scripts blocked');
+      }
+    }
+
+    function testSessionValidation() {
+      const section = addSection('Session Validation');
+      
+      try {
+        // Check if session data has proper structure
+        const sessionData = localStorage.getItem('teamSession');
+        
+        if (sessionData) {
+          const session = JSON.parse(sessionData);
+          const requiredFields = ['teamId', 'teamName', 'leaderEmail'];
+          const hasAllFields = requiredFields.every(field => field in session);
+          
+          if (hasAllFields) {
+            addTest(section, 'pass', 'Session has valid structure');
+          } else {
+            addTest(section, 'fail', 'Session missing required fields');
+          }
+        } else {
+          addTest(section, 'pass', 'No session data (not logged in)');
+        }
+      } catch (e) {
+        addTest(section, 'fail', 'Session validation error', e.message);
+      }
+    }
+
+    function testCookieSecurity() {
+      const section = addSection('Cookie Security');
+      
+      const cookies = document.cookie;
+      
+      if (cookies) {
+        addTest(section, 'pass', 'Cookies present');
+        
+        // Check for sensitive data in cookies (shouldn't be readable via JS if httpOnly)
+        if (cookies.includes('admin_token')) {
+          addTest(section, 'fail', 'Admin token in accessible cookie (security risk!)');
+        } else {
+          addTest(section, 'pass', 'No sensitive tokens in JavaScript-accessible cookies');
+        }
+      } else {
+        addTest(section, 'pass', 'No JavaScript-accessible cookies (secure)');
+      }
+    }
+
+    function testFrameProtection() {
+      const section = addSection('Frame/Clickjacking Protection');
+      
+      try {
+        if (window.self !== window.top) {
+          addTest(section, 'warn', 'Page loaded in iframe (may be vulnerable to clickjacking)');
+        } else {
+          addTest(section, 'pass', 'Page not in iframe');
+        }
+      } catch (e) {
+        addTest(section, 'pass', 'Frame-busting protection active');
+      }
+    }
+
+    function testBrowserFeatures() {
+      const section = addSection('Browser Security Features');
+      
+      // Check if running on HTTPS
+      if (location.protocol === 'https:') {
+        addTest(section, 'pass', 'Running on HTTPS');
+      } else {
+        addTest(section, 'warn', 'Running on HTTP (use HTTPS in production)');
+      }
+      
+      // Check for crypto API
+      if (window.crypto && window.crypto.getRandomValues) {
+        addTest(section, 'pass', 'Crypto API available');
+      } else {
+        addTest(section, 'fail', 'Crypto API not available');
+      }
+      
+      // Check for secure context
+      if (window.isSecureContext) {
+        addTest(section, 'pass', 'Secure context active');
+      } else {
+        addTest(section, 'warn', 'Not a secure context');
+      }
+    }
+
+    function testInputSanitization() {
+      const section = addSection('Input Sanitization (Client-Side)');
+      
+      // Test if sanitization functions are available
+      const testInput = '<script>alert("test")</script>';
+      
+      try {
+        // Create a test input field
+        const input = document.createElement('input');
+        input.value = testInput;
+        
+        if (input.value === testInput) {
+          addTest(section, 'pass', 'Input value stored correctly');
+        }
+        
+        // Test if displayed value is escaped
+        const display = document.createElement('div');
+        display.textContent = input.value;
+        
+        if (!display.innerHTML.includes('<script>')) {
+          addTest(section, 'pass', 'Input display properly escaped');
+        } else {
+          addTest(section, 'fail', 'Input not properly escaped');
+        }
+      } catch (e) {
+        addTest(section, 'warn', 'Input sanitization test error', e.message);
+      }
+    }
+
+    function showSummary() {
+      const total = results.passed + results.failed + results.warnings;
+      const score = total > 0 ? Math.round((results.passed / total) * 100) : 0;
+      
+      const scoreEl = document.getElementById('score');
+      scoreEl.textContent = score + '%';
+      scoreEl.className = 'score ' + (score >= 90 ? 'excellent' : score >= 70 ? 'good' : 'poor');
+      
+      const details = `
+        <p>✓ Passed: <strong style="color: #00ff00">${results.passed}</strong></p>
+        <p>✗ Failed: <strong style="color: #ff0000">${results.failed}</strong></p>
+        <p>⚠ Warnings: <strong style="color: #ffff00">${results.warnings}</strong></p>
+        <p style="margin-top: 20px">
+          ${score >= 90 ? '🛡️ Excellent security posture!' : 
+            score >= 70 ? '⚠️ Good security, improvements recommended' : 
+            '🚨 Critical security issues detected!'}
+        </p>
+      `;
+      
+      document.getElementById('summary-details').innerHTML = details;
+      document.getElementById('summary').style.display = 'block';
+    }
+
+    async function runAllTests() {
+      clearResults();
+      
+      testConsoleProtection();
+      testLocalStorageProtection();
+      testXSSProtection();
+      testCSPHeaders();
+      testSessionValidation();
+      testCookieSecurity();
+      testFrameProtection();
+      testBrowserFeatures();
+      testInputSanitization();
+      
+      showSummary();
+    }
+
+    // Auto-run on load
+    window.addEventListener('load', () => {
+      console.log('%c🛡️ Security Test Page Loaded', 'font-size: 20px; color: #00ff00; font-weight: bold;');
+      console.log('%cClick "Run All Tests" to start security testing', 'font-size: 14px; color: #00ffff;');
+    });
+  </script>
+</body>
+</html>

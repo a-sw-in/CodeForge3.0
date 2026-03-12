@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/adminAuthServer';
 import { supabase } from '@/lib/supabase';
-import { generateTicketPDF } from '@/lib/ticketPDF';
+import { generateTicketPDF } from '@/lib/ticketGenerator';
+import { writeFileSync, mkdirSync } from 'fs';
+import { join } from 'path';
 const SibApiV3Sdk = require('@sendinblue/client');
 
 // Email validation helper
@@ -13,12 +15,25 @@ function isValidEmail(email) {
   return emailRegex.test(email) && atCount === 1;
 }
 
-async function sendTicketEmail(teamData, ticketPDF) {
+async function sendTicketEmail(teamData, ticketPDF, ticketNumber) {
   try {
     // Validate email before attempting to send
     if (!isValidEmail(teamData.leader_email)) {
       throw new Error(`❌ Invalid email address: "${teamData.leader_email}". Please fix this email in the database (check for duplicate @ symbols).`);
     }
+    
+    // Save PDF to public folder for direct access
+    const ticketDir = join(process.cwd(), 'public', 'tickets');
+    mkdirSync(ticketDir, { recursive: true });
+    const fileName = `${ticketNumber}_${teamData.team_name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    const filePath = join(ticketDir, fileName);
+    
+    writeFileSync(filePath, ticketPDF);
+    console.log(`📄 Ticket saved: ${filePath}`);
+    
+    // Create download URL (relative to public folder)
+    const downloadUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/tickets/${fileName}`;
+    console.log(`🔗 Download URL: ${downloadUrl}`);
     
     // Initialize Brevo API
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
@@ -27,7 +42,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
       process.env.BREVO_API_KEY
     );
     
-    // Prepare HTML email content
+    
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -75,22 +90,26 @@ async function sendTicketEmail(teamData, ticketPDF) {
               padding: 15px;
               margin: 15px 0;
             }
+            .button {
+              display: inline-block;
+              background-color: #0055FF;
+              color: #ffffff;
+              padding: 14px 32px;
+              text-decoration: none;
+              border-radius: 5px;
+              margin: 15px 0;
+              font-weight: bold;
+              font-size: 16px;
+            }
+            .button:hover {
+              background-color: #0044CC;
+            }
             .footer {
               background-color: #f5f5f5;
               padding: 20px;
               text-align: center;
               font-size: 12px;
               color: #666;
-            }
-            .button {
-              display: inline-block;
-              background-color: #0055FF;
-              color: #ffffff;
-              padding: 12px 30px;
-              text-decoration: none;
-              border-radius: 5px;
-              margin: 10px 0;
-              font-weight: bold;
             }
           </style>
         </head>
@@ -110,11 +129,15 @@ async function sendTicketEmail(teamData, ticketPDF) {
                 Team Name: ${teamData.team_name}<br>
                 Team ID: #${teamData.team_id}<br>
                 Team Size: ${teamData.total_members} members<br>
+                Ticket #: <strong>${ticketNumber}</strong><br>
                 Leader: ${teamData.leader_name}
               </div>
               
-              <p>Your official entry ticket is attached to this email as a PDF file.</p>
-              <p><strong>📎 Attachment:</strong> CodeForge3.0_Ticket_${teamData.team_name}.pdf</p>
+              <div class="ticket-container">
+                <p><strong>Your official entry ticket is ready!</strong></p>
+                <a href="${downloadUrl}" class="button">📥 Download Your Ticket (PDF)</a>
+              </div>
+              
               <ul>
                 <li>Download and save the PDF ticket</li>
                 <li>Print it or keep it on your phone</li>
@@ -142,7 +165,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
       </html>
     `;
     
-    // Prepare email
+    // Prepare email (NO ATTACHMENT - just the download link)
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.to = [{ 
       email: teamData.leader_email, 
@@ -152,16 +175,10 @@ async function sendTicketEmail(teamData, ticketPDF) {
       email: process.env.BREVO_SENDER_EMAIL || 'noreply@codeforge3.com',
       name: process.env.BREVO_SENDER_NAME || 'CodeForge 3.0' 
     };
-    sendSmtpEmail.subject = '🎉 Your CodeForge 3.0 Ticket is Ready!';
+    sendSmtpEmail.subject = `🎉 Your CodeForge 3.0 Ticket is Ready! (${ticketNumber})`;
     sendSmtpEmail.htmlContent = htmlContent;
     
-    // Attach PDF ticket
-    sendSmtpEmail.attachment = [{
-      name: `CodeForge3.0_Ticket_${teamData.team_name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-      content: ticketPDF.toString('base64')
-    }];
-    
-    // Send email via Brevo
+    // Send email via Brevo (NO attachment)
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
     
     console.log('✅ Email sent successfully to:', teamData.leader_email);
@@ -170,7 +187,8 @@ async function sendTicketEmail(teamData, ticketPDF) {
     return { 
       success: true, 
       message: `Email sent to ${teamData.leader_email}`,
-      messageId: result.messageId
+      messageId: result.messageId,
+      ticketUrl: downloadUrl
     };
     
   } catch (error) {
@@ -222,16 +240,32 @@ export async function POST(request) {
       );
     }
     
-    // Generate ticket PDF
-    const ticketPDF = await generateTicketPDF(teamData);
+    // Generate ticket PDF from SVG template (with existing or new ticket number)
+    const result = await generateTicketPDF(teamData, teamData.ticket_number);
+    const  pdfBuffer = result.pdfBuffer;
+    const ticketNumber = result.ticketNumber;
     
-    // Send email with ticket
-    const emailResult = await sendTicketEmail(teamData, ticketPDF);
+    // Save ticket number to database if it's new
+    if (!teamData.ticket_number) {
+      const { error: updateError } = await supabase
+        .from('teams')
+        .update({ ticket_number: ticketNumber })
+        .eq('team_id', team_id);
+      
+      if (updateError) {
+        console.error('Error saving ticket number:', updateError);
+        // Continue anyway - ticket can still be sent
+      }
+    }
+    
+    // Send email with ticket download link
+    const emailResult = await sendTicketEmail(teamData, pdfBuffer, ticketNumber);
     
     return NextResponse.json({
       success: true,
       message: `Ticket sent to ${teamData.leader_email}`,
       ticketGenerated: true,
+      ticketNumber: ticketNumber,
       emailResult
     });
     

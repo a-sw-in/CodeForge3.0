@@ -542,6 +542,84 @@ export default function AdminDashboard({ inTabView = false }) {
                     </div>
                   </div>
 
+                  {/* Fee Summary */}
+                  <div className="pt-4 mt-4 p-3"
+                    style={{
+                      background: '#F0F9FF',
+                      border: '3px solid #0055FF',
+                      boxShadow: '3px 3px 0px #001A6E'
+                    }}>
+                    <label className="block text-xs font-bold uppercase mb-3" 
+                      style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                      💰 Payment Fee Summary
+                    </label>
+                    <div className="space-y-1 mb-3">
+                      {/* Leader */}
+                      <div className="flex justify-between text-xs px-2 py-1 rounded"
+                        style={{
+                          background: editedTeam?.leader_ieee_member ? '#E0F2FE' : '#FEF3C7',
+                          fontFamily: 'var(--y2k-font-ui)',
+                          color: '#001A6E'
+                        }}>
+                        <span>{editedTeam?.leader_name || 'Leader'} {editedTeam?.leader_ieee_member ? '(IEEE)' : ''}</span>
+                        <span className="font-bold">₹{editedTeam?.leader_ieee_member ? '399' : '499'}</span>
+                      </div>
+                      {/* Member 2 */}
+                      {(editedTeam?.total_members >= 2 || editedTeam?.member2_name) && (
+                        <div className="flex justify-between text-xs px-2 py-1 rounded"
+                          style={{
+                            background: editedTeam?.member2_ieee_member ? '#E0F2FE' : '#FEF3C7',
+                            fontFamily: 'var(--y2k-font-ui)',
+                            color: '#001A6E'
+                          }}>
+                          <span>{editedTeam?.member2_name || 'Member 2'} {editedTeam?.member2_ieee_member ? '(IEEE)' : ''}</span>
+                          <span className="font-bold">₹{editedTeam?.member2_ieee_member ? '399' : '499'}</span>
+                        </div>
+                      )}
+                      {/* Member 3 */}
+                      {(editedTeam?.total_members >= 3 || editedTeam?.member3_name) && (
+                        <div className="flex justify-between text-xs px-2 py-1 rounded"
+                          style={{
+                            background: editedTeam?.member3_ieee_member ? '#E0F2FE' : '#FEF3C7',
+                            fontFamily: 'var(--y2k-font-ui)',
+                            color: '#001A6E'
+                          }}>
+                          <span>{editedTeam?.member3_name || 'Member 3'} {editedTeam?.member3_ieee_member ? '(IEEE)' : ''}</span>
+                          <span className="font-bold">₹{editedTeam?.member3_ieee_member ? '399' : '499'}</span>
+                        </div>
+                      )}
+                      {/* Member 4 */}
+                      {(editedTeam?.total_members >= 4 || editedTeam?.member4_name) && (
+                        <div className="flex justify-between text-xs px-2 py-1 rounded"
+                          style={{
+                            background: editedTeam?.member4_ieee_member ? '#E0F2FE' : '#FEF3C7',
+                            fontFamily: 'var(--y2k-font-ui)',
+                            color: '#001A6E'
+                          }}>
+                          <span>{editedTeam?.member4_name || 'Member 4'} {editedTeam?.member4_ieee_member ? '(IEEE)' : ''}</span>
+                          <span className="font-bold">₹{editedTeam?.member4_ieee_member ? '399' : '499'}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="pt-2" style={{ borderTop: '2px solid #0055FF' }}>
+                      <div className="flex justify-between text-sm font-bold"
+                        style={{
+                          fontFamily: 'var(--y2k-font-display)',
+                          color: '#0055FF'
+                        }}>
+                        <span>Total Amount</span>
+                        <span>
+                          ₹{
+                            ((editedTeam?.leader_ieee_member ? 399 : 499)) +
+                            ((editedTeam?.total_members >= 2 || editedTeam?.member2_name) ? (editedTeam?.member2_ieee_member ? 399 : 499) : 0) +
+                            ((editedTeam?.total_members >= 3 || editedTeam?.member3_name) ? (editedTeam?.member3_ieee_member ? 399 : 499) : 0) +
+                            ((editedTeam?.total_members >= 4 || editedTeam?.member4_name) ? (editedTeam?.member4_ieee_member ? 399 : 499) : 0)
+                          }
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Payment Screenshots */}
                   {(() => {
                     try {
@@ -704,6 +782,64 @@ export default function AdminDashboard({ inTabView = false }) {
                           }}
                         />
                       </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase mb-2" 
+                          style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                          IEEE Member
+                        </label>
+                        <div className="flex items-center gap-3 p-3"
+                          style={{
+                            background: '#F8FAFC',
+                            border: '3px solid #E2E8F0',
+                          }}>
+                          <input
+                            id="leader-ieee-checkbox"
+                            type="checkbox"
+                            checked={Boolean(editedTeam?.leader_ieee_member)}
+                            onChange={(e) => handleFieldChange('leader_ieee_member', e.target.checked)}
+                            disabled={!isEditing}
+                            className="w-5 h-5"
+                            style={{
+                              accentColor: '#0055FF',
+                              cursor: isEditing ? 'pointer' : 'not-allowed'
+                            }}
+                          />
+                          <label
+                            htmlFor="leader-ieee-checkbox"
+                            className="text-sm font-bold uppercase"
+                            style={{
+                              fontFamily: 'var(--y2k-font-ui)',
+                              color: Boolean(editedTeam?.leader_ieee_member) ? '#00AA00' : '#64748B',
+                              letterSpacing: '0.06em',
+                              cursor: isEditing ? 'pointer' : 'default',
+                            }}
+                          >
+                            {Boolean(editedTeam?.leader_ieee_member) ? '✓ YES' : '✗ NO'}
+                          </label>
+                        </div>
+                      </div>
+                      {editedTeam?.leader_ieee_member && (
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#0055FF', letterSpacing: '0.1em' }}>
+                            IEEE Membership ID
+                          </label>
+                          <input
+                            type="text"
+                            value={editedTeam?.leader_ieee_id || ''}
+                            onChange={(e) => handleFieldChange('leader_ieee_id', e.target.value)}
+                            disabled={!isEditing}
+                            className="w-full px-4 py-2 text-sm font-medium"
+                            style={{
+                              fontFamily: 'var(--y2k-font-ui)',
+                              background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                              color: '#0055FF',
+                              border: '3px solid #0055FF',
+                              outline: 'none',
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -795,6 +931,64 @@ export default function AdminDashboard({ inTabView = false }) {
                             }}
                           />
                         </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                            IEEE Member
+                          </label>
+                          <div className="flex items-center gap-3 p-3"
+                            style={{
+                              background: '#F8FAFC',
+                              border: '3px solid #E2E8F0',
+                            }}>
+                            <input
+                              id="member2-ieee-checkbox"
+                              type="checkbox"
+                              checked={Boolean(editedTeam?.member2_ieee_member)}
+                              onChange={(e) => handleFieldChange('member2_ieee_member', e.target.checked)}
+                              disabled={!isEditing}
+                              className="w-5 h-5"
+                              style={{
+                                accentColor: '#0055FF',
+                                cursor: isEditing ? 'pointer' : 'not-allowed'
+                              }}
+                            />
+                            <label
+                              htmlFor="member2-ieee-checkbox"
+                              className="text-sm font-bold uppercase"
+                              style={{
+                                fontFamily: 'var(--y2k-font-ui)',
+                                color: Boolean(editedTeam?.member2_ieee_member) ? '#00AA00' : '#64748B',
+                                letterSpacing: '0.06em',
+                                cursor: isEditing ? 'pointer' : 'default',
+                              }}
+                            >
+                              {Boolean(editedTeam?.member2_ieee_member) ? '✓ YES' : '✗ NO'}
+                            </label>
+                          </div>
+                        </div>
+                        {editedTeam?.member2_ieee_member && (
+                          <div>
+                            <label className="block text-xs font-bold uppercase mb-2" 
+                              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#0055FF', letterSpacing: '0.1em' }}>
+                              IEEE Membership ID
+                            </label>
+                            <input
+                              type="text"
+                              value={editedTeam?.member2_ieee_id || ''}
+                              onChange={(e) => handleFieldChange('member2_ieee_id', e.target.value)}
+                              disabled={!isEditing}
+                              className="w-full px-4 py-2 text-sm font-medium"
+                              style={{
+                                fontFamily: 'var(--y2k-font-ui)',
+                                background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                                color: '#0055FF',
+                                border: '3px solid #0055FF',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -887,6 +1081,64 @@ export default function AdminDashboard({ inTabView = false }) {
                             }}
                           />
                         </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                            IEEE Member
+                          </label>
+                          <div className="flex items-center gap-3 p-3"
+                            style={{
+                              background: '#F8FAFC',
+                              border: '3px solid #E2E8F0',
+                            }}>
+                            <input
+                              id="member3-ieee-checkbox"
+                              type="checkbox"
+                              checked={Boolean(editedTeam?.member3_ieee_member)}
+                              onChange={(e) => handleFieldChange('member3_ieee_member', e.target.checked)}
+                              disabled={!isEditing}
+                              className="w-5 h-5"
+                              style={{
+                                accentColor: '#0055FF',
+                                cursor: isEditing ? 'pointer' : 'not-allowed'
+                              }}
+                            />
+                            <label
+                              htmlFor="member3-ieee-checkbox"
+                              className="text-sm font-bold uppercase"
+                              style={{
+                                fontFamily: 'var(--y2k-font-ui)',
+                                color: Boolean(editedTeam?.member3_ieee_member) ? '#00AA00' : '#64748B',
+                                letterSpacing: '0.06em',
+                                cursor: isEditing ? 'pointer' : 'default',
+                              }}
+                            >
+                              {Boolean(editedTeam?.member3_ieee_member) ? '✓ YES' : '✗ NO'}
+                            </label>
+                          </div>
+                        </div>
+                        {editedTeam?.member3_ieee_member && (
+                          <div>
+                            <label className="block text-xs font-bold uppercase mb-2" 
+                              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#0055FF', letterSpacing: '0.1em' }}>
+                              IEEE Membership ID
+                            </label>
+                            <input
+                              type="text"
+                              value={editedTeam?.member3_ieee_id || ''}
+                              onChange={(e) => handleFieldChange('member3_ieee_id', e.target.value)}
+                              disabled={!isEditing}
+                              className="w-full px-4 py-2 text-sm font-medium"
+                              style={{
+                                fontFamily: 'var(--y2k-font-ui)',
+                                background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                                color: '#0055FF',
+                                border: '3px solid #0055FF',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -979,6 +1231,64 @@ export default function AdminDashboard({ inTabView = false }) {
                             }}
                           />
                         </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                            IEEE Member
+                          </label>
+                          <div className="flex items-center gap-3 p-3"
+                            style={{
+                              background: '#F8FAFC',
+                              border: '3px solid #E2E8F0',
+                            }}>
+                            <input
+                              id="member4-ieee-checkbox"
+                              type="checkbox"
+                              checked={Boolean(editedTeam?.member4_ieee_member)}
+                              onChange={(e) => handleFieldChange('member4_ieee_member', e.target.checked)}
+                              disabled={!isEditing}
+                              className="w-5 h-5"
+                              style={{
+                                accentColor: '#0055FF',
+                                cursor: isEditing ? 'pointer' : 'not-allowed'
+                              }}
+                            />
+                            <label
+                              htmlFor="member4-ieee-checkbox"
+                              className="text-sm font-bold uppercase"
+                              style={{
+                                fontFamily: 'var(--y2k-font-ui)',
+                                color: Boolean(editedTeam?.member4_ieee_member) ? '#00AA00' : '#64748B',
+                                letterSpacing: '0.06em',
+                                cursor: isEditing ? 'pointer' : 'default',
+                              }}
+                            >
+                              {Boolean(editedTeam?.member4_ieee_member) ? '✓ YES' : '✗ NO'}
+                            </label>
+                          </div>
+                        </div>
+                        {editedTeam?.member4_ieee_member && (
+                          <div>
+                            <label className="block text-xs font-bold uppercase mb-2" 
+                              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#0055FF', letterSpacing: '0.1em' }}>
+                              IEEE Membership ID
+                            </label>
+                            <input
+                              type="text"
+                              value={editedTeam?.member4_ieee_id || ''}
+                              onChange={(e) => handleFieldChange('member4_ieee_id', e.target.value)}
+                              disabled={!isEditing}
+                              className="w-full px-4 py-2 text-sm font-medium"
+                              style={{
+                                fontFamily: 'var(--y2k-font-ui)',
+                                background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                                color: '#0055FF',
+                                border: '3px solid #0055FF',
+                                outline: 'none',
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

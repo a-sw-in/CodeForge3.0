@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/adminAuthServer';
 import { supabase } from '@/lib/supabase';
-import { generateTicketPDF } from '@/lib/ticketPDF';
+import { generateTicketPDF } from '@/lib/ticketGenerator';
 const SibApiV3Sdk = require('@sendinblue/client');
 
 // Email validation helper
@@ -29,103 +29,27 @@ async function sendTicketEmail(teamData, ticketPDF) {
     const htmlContent = `
       <!DOCTYPE html>
       <html>
-        <head>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              background-color: #f5f5f5;
-              margin: 0;
-              padding: 20px;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              background-color: #ffffff;
-              border-radius: 10px;
-              overflow: hidden;
-              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            }
-            .header {
-              background: linear-gradient(135deg, #0055FF 0%, #001A6E 100%);
-              color: #CCFF00;
-              padding: 30px;
-              text-align: center;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-              font-weight: bold;
-            }
-            .content {
-              padding: 30px;
-              color: #333;
-            }
-            .ticket-container {
-              margin: 20px 0;
-              text-align: center;
-              background-color: #f9f9f9;
-              padding: 20px;
-              border-radius: 8px;
-            }
-            .info-box {
-              background-color: #f0f9ff;
-              border-left: 4px solid #0055FF;
-              padding: 15px;
-              margin: 15px 0;
-            }
-            .footer {
-              background-color: #f5f5f5;
-              padding: 20px;
-              text-align: center;
-              font-size: 12px;
-              color: #666;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🎉 Welcome to CodeForge 3.0!</h1>
-            </div>
-            
-            <div class="content">
-              <h2>Hi ${teamData.leader_name}! 👋</h2>
-              
-              <p>Congratulations! Your team <strong>${teamData.team_name}</strong> has been approved for CodeForge 3.0.</p>
-              
-              <div class="info-box">
-                <strong>📋 Team Details:</strong><br>
-                Team Name: ${teamData.team_name}<br>
-                Team ID: #${teamData.team_id}<br>
-                Team Size: ${teamData.total_members} members<br>
-                Leader: ${teamData.leader_name}
-              </div>
-              
-              <p>Your official entry ticket is attached to this email as a PDF file.</p>
-              <p><strong>📎 Attachment:</strong> CodeForge3.0_Ticket_${teamData.team_name}.pdf</p>
-              <ul>
-                <li>Download and save the PDF ticket</li>
-                <li>Print it or keep it on your phone</li>
-                <li>Bring it with you on event day</li>
-                <li>Forward this email to your team members</li>
-              </ul>
-              
-              <p style="margin-top: 20px;">
-                <strong>What's Next?</strong><br>
-                - Check your email for event updates<br>
-                - Join our community (link coming soon)<br>
-                - Start preparing your ideas!
-              </p>
-            </div>
-            
-            <div class="footer">
-              <p>CodeForge 3.0 | IEEE UCEK Branch</p>
-              <p>24-Hour Hackathon | Innovation • Code • Create</p>
-              <p style="font-size: 10px; margin-top: 10px;">
-                This is an automated email. Please do not reply to this message.
-              </p>
-            </div>
-          </div>
+        <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px;">
+          <p>Hi ${teamData.leader_name},</p>
+          
+          <p>Your team ${teamData.team_name} has been approved for CodeForge 3.0, the 24-hour hackathon by IEEE UCEK Branch.</p>
+          
+          <p>
+            <strong>Team Details</strong><br>
+            Team ID: #${teamData.team_id}<br>
+            Team Size: ${teamData.total_members} members<br>
+            Leader: ${teamData.leader_name}
+          </p>
+          
+          <p>Your entry ticket is attached as a PDF.</p>
+          
+          <p>Further updates will be shared soon.</p>
+          
+          <p>
+            Regards,<br>
+            Team CodeForge 3.0<br>
+            IEEE UCEK Branch
+          </p>
         </body>
       </html>
     `;
@@ -285,12 +209,26 @@ export async function PUT(request) {
     // If team is newly approved, send ticket email
     if (isNewlyApproved) {
       try {
-        const ticketPDF = await generateTicketPDF(data);
+        const { pdfBuffer, ticketNumber } = await generateTicketPDF(data);
         
-        console.log('🎫 Team approved! Generating PDF ticket for:', data.team_name);
+        console.log('🎫 Team approved! Generating PDF ticket from SVG for:', data.team_name, 'Ticket:', ticketNumber);
         
+        // Save ticket number to database
+        const { error: updateTicketError } = await supabase
+          .from('teams')
+          .update({ ticket_number: ticketNumber })
+          .eq('team_id', data.team_id);
+          
+        if (updateTicketError) {
+          console.error('❌ Error saving ticket number to DB:', updateTicketError);
+        } else {
+          console.log('✅ Ticket number saved to database:', ticketNumber);
+          // Update the local data object to reflect the new ticket number
+          data.ticket_number = ticketNumber;
+        }
+
         // Send email with ticket
-        await sendTicketEmail(data, ticketPDF);
+        await sendTicketEmail(data, pdfBuffer);
         
         console.log('✅ Ticket email sent successfully to:', data.leader_email);
         

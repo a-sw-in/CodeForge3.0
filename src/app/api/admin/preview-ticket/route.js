@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/adminAuthServer';
 import { supabase } from '@/lib/supabase';
-import { generateTicketPDF } from '@/lib/ticketPDF';
+import { generateTicketPDF } from '@/lib/ticketGenerator';
 
 export async function GET(request) {
   try {
@@ -40,11 +40,11 @@ export async function GET(request) {
       );
     }
     
-    // Generate ticket PDF
-    const ticketPDF = await generateTicketPDF(teamData);
+    // Generate ticket PDF from SVG (using existing ticket number if available)
+    const { pdfBuffer } = await generateTicketPDF(teamData, teamData.ticket_number);
     
     // Return PDF with proper content type
-    return new NextResponse(ticketPDF, {
+    return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `inline; filename="CodeForge3.0_Ticket_${teamData.team_name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`,

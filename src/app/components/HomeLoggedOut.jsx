@@ -135,14 +135,14 @@ function Y2KButton({ children, onClick, variant = 'primary' }) {
 
 /* ─── Feature card data ─── */
 const FEATURES = [
-  { icon: IconTrophy, label: '₹15K+', sub: 'Prize Pool', color: '#CCFF00' },
+  { icon: IconTrophy, label: '₹12K+', sub: 'Prize Pool', color: '#CCFF00' },
   { icon: IconUsers, label: '2–4', sub: 'Team Size', color: '#00CCFF' },
   { icon: IconBolt, label: '24hr', sub: 'Hackathon', color: '#FF44AA' },
 ];
 
 /* ─── Marquee strip ─── */
 function MarqueeStrip() {
-  const words = ['CODEFORGE 3.0', '★', 'IEEE UCEK', '★', '24 HOURS', '★', 'BUILD & WIN', '★', 'MARCH 2025', '★'];
+  const words = ['CODEFORGE 3.0', '★', 'IEEE UCEK', '★', '24 HOURS', '★', 'BUILD & WIN', '★', 'MARCH 2026', '★'];
   const rep = [...words, ...words];
   return (
     <div className="w-full overflow-hidden py-3" style={{ background: '#CCFF00', borderTop: '3px solid #001A6E', borderBottom: '3px solid #001A6E' }}>
@@ -330,8 +330,8 @@ export default function HomeLoggedOut({ session, onDashboard }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
-              { title: 'Cash Prizes', desc: 'Compete for ₹15,000+ in prizes across multiple categories. Real rewards for real innovation.', color: '#CCFF00' },
-              { title: 'Team Sprint', desc: '2-4 person teams tackling real problems in 24 hours. Collaboration at its finest.', color: '#00CCFF' },
+              { title: 'Cash Prize', desc: 'Compete for ₹12,000 in prizes across multiple categories. Real rewards for real innovation.', color: '#CCFF00' },
+              { title: 'Team Sprint', desc: 'A 24 hour challenge where teams of 2-4 work together so solve real problems and create innovative solutions', color: '#00CCFF' },
               { title: '24hr Grind', desc: 'Intense, focused, exhilarating. Build something remarkable in a single day with expert mentors.', color: '#FF44AA' },
             ].map((card, i) => (
               <motion.div key={card.title}
