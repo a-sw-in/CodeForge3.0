@@ -4,14 +4,14 @@
         "tagline": "The Ultimate 24-Hour Coding Showdown",
         "organizer": "IEEE SB UCEK",
         "coOrganizer": "IEEE RAS SB UCEK",
-        "date": "2026-04-15",
-        "dateDisplay": "April 2026",
+        "date": "2026-03-22",
+        "dateDisplay": "March 2026",
         "location": "UCEK · TVM",
         "duration": "24 Hours",
-        "registrationDeadline": "2026-04-10T23:59:59",
-        "hackathonStart": "2026-04-15T09:00:00",
+        "registrationDeadline": "2026-03-02T09:00:00",
+        "hackathonStart": "2026-03-22T09:00:00",
         "email": "ieeesbucek@gmail.com",
-        "phone": "+91 79079 77205",
+        "phone": "+91 62380 67296",
         "social": {
             "instagram": "#",
             "github": "#",
@@ -56,7 +56,7 @@
             "title": "Registration Opens",
             "date": "MAR 20",
             "year": "2026",
-            "description": "Kick off your CodeForge 3.0 journey! Registration opens for all participants.",
+            "description": "Kick off your CodeForge 3.0 journey! Registration is now open for all participants.",
             "color": "#CCFF00",
             "textColor": "#001A6E"
         },
@@ -64,7 +64,7 @@
             "title": "Registration Closes",
             "date": "APR 10",
             "year": "2026",
-            "description": "Last day to register. Don't miss your chance to compete!",
+            "description": "Final call to join the hackathon. Don't miss your chance to be part of the challenge!",
             "color": "#00CCFF",
             "textColor": "#001A6E"
         },
@@ -72,7 +72,7 @@
             "title": "Shortlisting",
             "date": "APR 12",
             "year": "2026",
-            "description": "Teams shortlisted based on submitted profiles and ideas.",
+            "description": "Submitted team profiles and ideas will be reviewed. Shortlisted teams will move forward to the hackathon.",
             "color": "#FF44AA",
             "textColor": "#FFFFFF"
         },
@@ -80,7 +80,7 @@
             "title": "Hackathon Kickoff",
             "date": "APR 15",
             "year": "2026",
-            "description": "The hackathon begins! Start building your innovative solution.",
+            "description": "The hackathon begins. Start building your project and turn your idea into a working solution.",
             "color": "#CCFF00",
             "textColor": "#001A6E"
         },
@@ -88,7 +88,7 @@
             "title": "Hackathon Ends",
             "date": "APR 16",
             "year": "2026",
-            "description": "Submit your project before the final deadline.",
+            "description": "Submit your project before the deadline. Make sure everything is ready for review.",
             "color": "#00CCFF",
             "textColor": "#001A6E"
         },
@@ -103,36 +103,36 @@
     ],
     "faq": [
         {
-            "question": "Who can participate in CodeForge 3.0?",
-            "answer": "Open to students, professionals, and coding enthusiasts of all skill levels. Beginner or expert — you're welcome!"
+            "question": "Who is eligible to participate in CodeForge 3.0?",
+            "answer": "Participants from any academic or professional background with an interest in software development, design, or problem-solving are welcome. Teams should consist of 2–4 members."
         },
         {
-            "question": "Do I need a team?",
-            "answer": "Teams of 2–4 are encouraged. Solo entries are welcome too. We'll help you connect with others at the networking session."
-        },
-        {
-            "question": "What should I bring?",
-            "answer": "Laptop, chargers, student ID, and enthusiasm. We provide food, drinks, WiFi, and workspace throughout the event."
-        },
-        {
-            "question": "Are there problem statements?",
-            "answer": "Yes! Announced at the opening ceremony. Themes span AI/ML, Web3, IoT, Sustainability, and Social Impact."
-        },
-        {
-            "question": "What are the prizes?",
-            "answer": "Cash prizes, certificates, mentorship, and internship offers from sponsors. All participants get certificates and merch!"
-        },
-        {
-            "question": "Can I use external libraries?",
-            "answer": "Yes! Any open-source tools are allowed. Core innovation must be original work created during the hackathon."
+            "question": "What are the team requirements for registration?",
+            "answer": "Teams must consist of 2–4 members at the time of registration. Solo entries or incomplete teams are not permitted."
         },
         {
             "question": "Is there a registration fee?",
-            "answer": "No! Completely free — including events, meals, networking, workshops, and mentorship."
+            "answer": "Yes. Registration fees are ₹399 per participant for IEEE members and ₹499 per participant for non-IEEE members."
         },
         {
-            "question": "Will there be mentors?",
-            "answer": "Yes! Industry experts and senior developers are available throughout to give guidance and technical support."
+            "question": "Can I form or modify a team after registration?",
+            "answer": "No. Teams must be complete and finalized during registration. All member details must be submitted at that time."
+        },
+        {
+            "question": "What resources and tools are permitted during the hackathon?",
+            "answer": "Participants can use any programming languages, frameworks, libraries, or APIs that comply with the hackathon rules."
+        },
+        {
+            "question": "Are mentors available during the hackathon?",
+            "answer": "Yes. Experienced mentors will be available throughout the event to provide guidance, feedback, and technical support."
+        },
+        {
+            "question": "What kind of support is available during the hackathon?",
+            "answer": "Participants will have access to high-speed, reliable Wi-Fi and on-site technical support to ensure smooth development, troubleshooting, and uninterrupted collaboration throughout the event."
+        },
+        {
+            "question": "Will there be breaks and refreshments during the hackathon?",
+            "answer": "Yes. Participants will have scheduled breaks and interactive fun sessions to relax and recharge. Meals and snacks will be provided throughout the event to keep teams energized."
         }
     ],
     "pastEvents": [

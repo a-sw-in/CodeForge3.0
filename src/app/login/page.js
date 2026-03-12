@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconHash, IconUpload, IconX, IconPhone } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
+import data from '@/data/hackathon.json';
 
 export default function LoginPage() {
   const shouldReduceMotion = useReducedMotion();
@@ -1458,7 +1459,7 @@ export default function LoginPage() {
                         fontFamily: 'var(--y2k-font-ui)',
                         color: '#001A6E'
                       }}>
-                      <p className="text-xs font-bold">{phone || 'Not provided'}</p>
+                      <p className="text-xs font-bold">{data.event.phone || 'Contact support'}</p>
                     </div>
                   </div>
 

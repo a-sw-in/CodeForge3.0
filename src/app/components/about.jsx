@@ -111,10 +111,8 @@ const About = () => {
                 </h3>
               </div>
               <p className="text-sm leading-relaxed mt-4" style={{ color: '#334155', fontFamily: 'var(--y2k-font-ui)' }}>
-                We believe in pushing boundaries and creating solutions that matter.
-                This hackathon is your gateway to innovation, industry networking,
-                and showcasing your skills on a grand stage.
-              </p>
+                CodeForge 3.0 brings together creative minds to innovate, collaborate, and solve real-world challenges. It’s an opportunity to build impactful solutions while connecting with a community of passionate developers.
+                </p>
               <div className="flex items-center gap-2 mt-5 pt-4 flex-wrap" style={{ borderTop: '2px dashed #CBD5E1' }}>
                 <span className="text-xs font-black uppercase" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#94A3B8' }}>
                   {event.organizer} × {event.coOrganizer}
