@@ -351,7 +351,7 @@ export default function HomeLoggedOut() {
 
       {/* Existing sections */}
       <div id="about-section"><About /></div>
-      <ScheduleTimeline />
+      <div id="schedule-section"><ScheduleTimeline /></div>
       <div id="register-section"><RulesAndFAQ /></div>
       <Footer />
     </div>
