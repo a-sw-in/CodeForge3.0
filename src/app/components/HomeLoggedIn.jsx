@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 /* ─── Repeating text watermark background ─── */
@@ -33,6 +34,50 @@ function StarBurst({ color = '#CCFF00', size = 140, style = {} }) {
 
 export default function HomeLoggedIn({ session }) {
   const isApproved = Boolean(session?.approved);
+  const [announcements, setAnnouncements] = useState([]);
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
+
+  // Fetch announcements from database
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const response = await fetch('/api/announcements');
+        const data = await response.json();
+        
+        if (data.success) {
+          setAnnouncements(data.announcements || []);
+        }
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+      } finally {
+        setLoadingAnnouncements(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
+  // Helper function to get announcement style based on type
+  const getAnnouncementStyle = (type) => {
+    switch (type) {
+      case 'warning':
+        return {
+          background: '#FFF7ED',
+          border: '3px solid #FBBF24'
+        };
+      case 'success':
+        return {
+          background: '#F0FDF4',
+          border: '3px solid #34D399'
+        };
+      case 'info':
+      default:
+        return {
+          background: '#F0F9FF',
+          border: '3px solid #0055FF'
+        };
+    }
+  };
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 md:px-6 pt-24 md:pt-28 pb-12 md:pb-16" style={{ background: '#0055FF' }}>
@@ -197,8 +242,9 @@ export default function HomeLoggedIn({ session }) {
             </div>
             {/* Content */}
             <div className="p-4">
-              <motion.button 
-                className="w-full py-2.5 font-bold uppercase text-xs"
+              <motion.a
+                href="/schedule"
+                className="block w-full py-2.5 font-bold uppercase text-xs text-center"
                 style={{
                   fontFamily: 'var(--y2k-font-ui)',
                   background: '#CCFF00',
@@ -211,7 +257,7 @@ export default function HomeLoggedIn({ session }) {
                 whileTap={{ x: 1, y: 1, boxShadow: '1px 1px 0px #001A6E' }}
               >
                 View Schedule
-              </motion.button>
+              </motion.a>
             </div>
           </motion.div>
         </div>
@@ -242,36 +288,44 @@ export default function HomeLoggedIn({ session }) {
           </div>
           {/* Content */}
           <div className="p-4 md:p-6 space-y-3">
-            <div className="p-3 md:p-4"
-              style={{ 
-                background: '#F0F9FF', 
-                border: '3px solid #0055FF',
-                boxShadow: '3px 3px 0px #001A6E'
-              }}>
-              <p className="text-xs md:text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                 Welcome to CodeForge 3.0! Make sure to check the schedule and rules before the event.
-              </p>
-            </div>
-            <div className="p-3 md:p-4"
-              style={{ 
-                background: '#FFF7ED', 
-                border: '3px solid #FBBF24',
-                boxShadow: '3px 3px 0px #001A6E'
-              }}>
-              <p className="text-xs md:text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                 Event starts in 30 days. Stay tuned for more updates!
-              </p>
-            </div>
-            <div className="p-3 md:p-4"
-              style={{ 
-                background: '#F0FDF4', 
-                border: '3px solid #34D399',
-                boxShadow: '3px 3px 0px #001A6E'
-              }}>
-              <p className="text-xs md:text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                 Your team is all set! Get ready to build something amazing.
-              </p>
-            </div>
+            {loadingAnnouncements ? (
+              <div className="p-3 md:p-4 text-center"
+                style={{ 
+                  background: '#F0F9FF', 
+                  border: '3px solid #0055FF',
+                  boxShadow: '3px 3px 0px #001A6E'
+                }}>
+                <p className="text-xs md:text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                  Loading announcements...
+                </p>
+              </div>
+            ) : announcements.length === 0 ? (
+              <div className="p-3 md:p-4 text-center"
+                style={{ 
+                  background: '#F0F9FF', 
+                  border: '3px solid #0055FF',
+                  boxShadow: '3px 3px 0px #001A6E'
+                }}>
+                <p className="text-xs md:text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                  No announcements at this time.
+                </p>
+              </div>
+            ) : (
+              announcements.map((announcement) => (
+                <div 
+                  key={announcement.id}
+                  className="p-3 md:p-4"
+                  style={{ 
+                    ...getAnnouncementStyle(announcement.type),
+                    boxShadow: '3px 3px 0px #001A6E'
+                  }}
+                >
+                  <p className="text-xs md:text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                    {announcement.content}
+                  </p>
+                </div>
+              ))
+            )}
           </div>
         </motion.div>
       </motion.div>

@@ -27,6 +27,7 @@ const pressStart2P = Press_Start_2P({
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
+  const isTimerRoute = pathname === '/timer';
 
   return (
     <html lang="en">
@@ -34,7 +35,7 @@ export default function RootLayout({ children }) {
         className={`${pressStart2P.variable} ${outfit.variable} ${plusJakarta.variable} antialiased`}
         style={{ background: '#FFFDF5' }}
       >
-        {!isAdminRoute && <FloatingDockDemo />}
+        {!isAdminRoute && !isTimerRoute && <FloatingDockDemo />}
         <LoadingWrapper>
           {children}
         </LoadingWrapper>
