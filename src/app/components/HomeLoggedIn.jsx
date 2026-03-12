@@ -32,7 +32,7 @@ function StarBurst({ color = '#CCFF00', size = 140, style = {} }) {
   );
 }
 
-export default function HomeLoggedIn({ session }) {
+export default function HomeLoggedIn({ session, onBack }) {
   const isApproved = Boolean(session?.approved);
   const [announcements, setAnnouncements] = useState([]);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
@@ -83,9 +83,10 @@ export default function HomeLoggedIn({ session }) {
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 md:px-6 pt-24 md:pt-28 pb-12 md:pb-16" style={{ background: '#0055FF' }}>
       {/* Watermark Background */}
       <Watermark />
-      {/* Logged In Badge - Top Left - Y2K Style */}
-      <motion.div
-        className="fixed top-10 left-4 md:left-8 z-20 inline-flex items-center gap-2 px-4 py-2"
+      {/* Back Button - Top Left - Y2K Style */}
+      <motion.button
+        onClick={onBack}
+        className="fixed top-10 left-4 md:left-8 z-20 inline-flex items-center gap-2 px-4 py-2 cursor-pointer"
         style={{
           background: '#CCFF00',
           border: '3px solid #001A6E',
@@ -94,12 +95,16 @@ export default function HomeLoggedIn({ session }) {
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
+        whileHover={{ x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' }}
+        whileTap={{ x: 1, y: 1, boxShadow: '2px 2px 0px #001A6E' }}
       >
-        <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ background: '#00FF00' }} />
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#001A6E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
         <p className="uppercase text-xs font-bold tracking-wider" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
-          Logged In
+          Back
         </p>
-      </motion.div>
+      </motion.button>
 
       {/* Y2K Background decorations - Star Bursts */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>

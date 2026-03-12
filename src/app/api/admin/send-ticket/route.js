@@ -20,12 +20,14 @@ async function sendTicketEmail(teamData, ticketPDF) {
       throw new Error(`❌ Invalid email address: "${teamData.leader_email}". Please fix this email in the database (check for duplicate @ symbols).`);
     }
     
+    // Initialize Brevo API
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
     apiInstance.setApiKey(
       SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, 
       process.env.BREVO_API_KEY
     );
     
+    // Prepare HTML email content
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -80,6 +82,16 @@ async function sendTicketEmail(teamData, ticketPDF) {
               font-size: 12px;
               color: #666;
             }
+            .button {
+              display: inline-block;
+              background-color: #0055FF;
+              color: #ffffff;
+              padding: 12px 30px;
+              text-decoration: none;
+              border-radius: 5px;
+              margin: 10px 0;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
@@ -113,7 +125,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
               <p style="margin-top: 20px;">
                 <strong>What's Next?</strong><br>
                 - Check your email for event updates<br>
-                - Join our community (link coming soon)<br>
+                - Join our Discord/Slack community (link coming soon)<br>
                 - Start preparing your ideas!
               </p>
             </div>
@@ -130,6 +142,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
       </html>
     `;
     
+    // Prepare email
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.to = [{ 
       email: teamData.leader_email, 
@@ -148,19 +161,25 @@ async function sendTicketEmail(teamData, ticketPDF) {
       content: ticketPDF.toString('base64')
     }];
     
+    // Send email via Brevo
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
     
     console.log('✅ Email sent successfully to:', teamData.leader_email);
     console.log('📧 Message ID:', result.messageId);
     
-    return true;
+    return { 
+      success: true, 
+      message: `Email sent to ${teamData.leader_email}`,
+      messageId: result.messageId
+    };
+    
   } catch (error) {
     console.error('❌ Error sending email:', error);
     throw error;
   }
 }
 
-export async function GET() {
+export async function POST(request) {
   try {
     // Verify admin authentication
     const authenticated = await isAdminAuthenticated();
@@ -172,144 +191,54 @@ export async function GET() {
       );
     }
     
-    // Fetch teams data from Supabase
-    const { data: teams, error } = await supabase
-      .from('teams')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { team_id } = await request.json();
     
-    if (error) {
-      console.error('Error fetching teams:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch teams' },
-        { status: 500 }
-      );
-    }
-    
-    // Calculate statistics
-    const totalTeams = teams.length;
-    const totalMembers = teams.reduce((sum, team) => {
-      // Count members based on your database schema
-      // Adjust this based on your actual schema
-      return sum + (team.total_members || 0);
-    }, 0);
-    
-    return NextResponse.json({
-      success: true,
-      teams,
-      statistics: {
-        totalTeams,
-        totalMembers
-      }
-    });
-    
-  } catch (error) {
-    console.error('Teams API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-export async function PUT(request) {
-  try {
-    // Verify admin authentication
-    const authenticated = await isAdminAuthenticated();
-    
-    if (!authenticated) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
-    const teamData = await request.json();
-    
-    if (!teamData.team_id) {
+    if (!team_id) {
       return NextResponse.json(
         { error: 'Team ID is required' },
         { status: 400 }
       );
     }
     
-    // Check current approval status before update
-    const { data: currentTeam, error: fetchError } = await supabase
+    // Fetch team data
+    const { data: teamData, error } = await supabase
       .from('teams')
-      .select('approved')
-      .eq('team_id', teamData.team_id)
+      .select('*')
+      .eq('team_id', team_id)
       .single();
     
-    if (fetchError) {
-      console.error('Error fetching current team:', fetchError);
-    }
-    
-    const wasApproved = currentTeam?.approved;
-    const isNowApproved = Boolean(teamData.approved);
-    const isNewlyApproved = !wasApproved && isNowApproved;
-    
-    // Prepare update data - only include editable fields
-    const updateData = {
-      team_name: teamData.team_name,
-      total_members: teamData.total_members,
-      approved: Boolean(teamData.approved),
-      leader_name: teamData.leader_name,
-      leader_email: teamData.leader_email,
-      leader_year: teamData.leader_year,
-      member2_name: teamData.member2_name || null,
-      member2_email: teamData.member2_email || null,
-      member2_year: teamData.member2_year || null,
-      member3_name: teamData.member3_name || null,
-      member3_email: teamData.member3_email || null,
-      member3_year: teamData.member3_year || null,
-      member4_name: teamData.member4_name || null,
-      member4_email: teamData.member4_email || null,
-      member4_year: teamData.member4_year || null,
-    };
-    
-    // Update team in Supabase
-    const { data, error } = await supabase
-      .from('teams')
-      .update(updateData)
-      .eq('team_id', teamData.team_id)
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('Error updating team:', error);
+    if (error || !teamData) {
       return NextResponse.json(
-        { error: 'Failed to update team' },
-        { status: 500 }
+        { error: 'Team not found' },
+        { status: 404 }
       );
     }
     
-    // If team is newly approved, send ticket email
-    if (isNewlyApproved) {
-      try {
-        const ticketPDF = await generateTicketPDF(data);
-        
-        console.log('🎫 Team approved! Generating PDF ticket for:', data.team_name);
-        
-        // Send email with ticket
-        await sendTicketEmail(data, ticketPDF);
-        
-        console.log('✅ Ticket email sent successfully to:', data.leader_email);
-        
-      } catch (ticketError) {
-        console.error('❌ Error generating/sending ticket:', ticketError);
-        // Don't fail the update if ticket generation fails
-      }
+    // Check if team is approved
+    if (!teamData.approved) {
+      return NextResponse.json(
+        { error: 'Team must be approved first' },
+        { status: 400 }
+      );
     }
+    
+    // Generate ticket PDF
+    const ticketPDF = await generateTicketPDF(teamData);
+    
+    // Send email with ticket
+    const emailResult = await sendTicketEmail(teamData, ticketPDF);
     
     return NextResponse.json({
       success: true,
-      team: data,
-      ticketSent: isNewlyApproved
+      message: `Ticket sent to ${teamData.leader_email}`,
+      ticketGenerated: true,
+      emailResult
     });
     
   } catch (error) {
-    console.error('Update team API error:', error);
+    console.error('Send ticket API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error.message },
       { status: 500 }
     );
   }

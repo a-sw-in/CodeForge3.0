@@ -4,12 +4,12 @@
         "tagline": "The Ultimate 24-Hour Coding Showdown",
         "organizer": "IEEE SB UCEK",
         "coOrganizer": "IEEE RAS SB UCEK",
-        "date": "2025-07-25",
-        "dateDisplay": "July 2025",
+        "date": "2026-04-15",
+        "dateDisplay": "April 2026",
         "location": "UCEK · TVM",
         "duration": "24 Hours",
-        "registrationDeadline": "2025-07-20T23:59:59",
-        "hackathonStart": "2025-07-25T09:00:00",
+        "registrationDeadline": "2026-04-10T23:59:59",
+        "hackathonStart": "2026-04-15T09:00:00",
         "email": "ieeesbucek@gmail.com",
         "phone": "+91 79079 77205",
         "social": {
@@ -54,48 +54,48 @@
     "schedule": [
         {
             "title": "Registration Opens",
-            "date": "JUL 10",
-            "year": "2025",
+            "date": "MAR 20",
+            "year": "2026",
             "description": "Kick off your CodeForge 3.0 journey! Registration opens for all participants.",
             "color": "#CCFF00",
             "textColor": "#001A6E"
         },
         {
             "title": "Registration Closes",
-            "date": "JUL 20",
-            "year": "2025",
+            "date": "APR 10",
+            "year": "2026",
             "description": "Last day to register. Don't miss your chance to compete!",
             "color": "#00CCFF",
             "textColor": "#001A6E"
         },
         {
             "title": "Shortlisting",
-            "date": "JUL 22",
-            "year": "2025",
+            "date": "APR 12",
+            "year": "2026",
             "description": "Teams shortlisted based on submitted profiles and ideas.",
             "color": "#FF44AA",
             "textColor": "#FFFFFF"
         },
         {
             "title": "Hackathon Kickoff",
-            "date": "JUL 25",
-            "year": "2025",
+            "date": "APR 15",
+            "year": "2026",
             "description": "The hackathon begins! Start building your innovative solution.",
             "color": "#CCFF00",
             "textColor": "#001A6E"
         },
         {
             "title": "Hackathon Ends",
-            "date": "JUL 27",
-            "year": "2025",
+            "date": "APR 16",
+            "year": "2026",
             "description": "Submit your project before the final deadline.",
             "color": "#00CCFF",
             "textColor": "#001A6E"
         },
         {
             "title": "Results & Awards",
-            "date": "JUL 30",
-            "year": "2025",
+            "date": "APR 18",
+            "year": "2026",
             "description": "Winners announced and prizes awarded in a live ceremony.",
             "color": "#FF44AA",
             "textColor": "#FFFFFF"

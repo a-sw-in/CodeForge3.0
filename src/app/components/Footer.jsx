@@ -51,7 +51,7 @@ const Footer = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.15 }} viewport={{ once: true }}
-            className="w-full ml-[9vw] lg:w-auto shrink-0">
+            className="w-full lg:ml-[9vw] lg:w-auto shrink-0">
             <div style={{ border: '3px solid #CCFF00', background: '#ffffffff', boxShadow: '6px 6px 0px rgba(255,255,255,0.3)' }}>
               <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '3px solid #001A6E', background: '#CCFF00' }}>
                 <span className="font-black text-xs uppercase tracking-widest" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>register.exe</span>
@@ -159,10 +159,10 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-5 mt-0"
+        <div className="flex pb-[10vh] flex-col sm:flex-row items-center justify-between gap-2 pt-5 mt-0"
           style={{ borderTop: '2px solid rgba(255,255,255,0.08)' }}>
           <p className="text-xs font-black uppercase text-center sm:text-left" style={{ fontFamily: 'var(--y2k-font-mono)', color: 'rgba(255,255,255,0.3)' }}>
-            MADE W/ ❤️ BY {event.organizer} TECH TEAM
+            MADE WITH ❤️ BY {event.organizer} TECH TEAM
           </p>
           <p className="text-xs font-black uppercase" style={{ fontFamily: 'var(--y2k-font-mono)', color: 'rgba(255,255,255,0.3)' }}>
             © 2025 {event.name}. ALL RIGHTS RESERVED

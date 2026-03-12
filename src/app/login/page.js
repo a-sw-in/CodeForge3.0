@@ -375,7 +375,7 @@ export default function LoginPage() {
             style={{ background: '#CCFF00', borderBottom: '3px solid #001A6E' }}>
             <span className="font-bold text-sm uppercase tracking-wide" 
               style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
-              {step === 'email' ? '⚡ Welcome' : step === 'login' ? '🔐 Login' : step === 'team-members' ? '👥 Team Members' : step === 'payment' ? '💳 Payment' : '📝 Register'}
+              {step === 'email' ? ' Welcome' : step === 'login' ? ' Login' : step === 'team-members' ? ' Team Members' : step === 'payment' ? ' Payment' : ' Register'}
             </span>
             <div className="flex items-center justify-center w-5 h-5"
               style={{ background: '#FFFFFF', border: '2px solid #001A6E' }}>

@@ -158,12 +158,18 @@ function MarqueeStrip() {
 }
 
 /* ─── Main ─── */
-export default function HomeLoggedOut() {
+export default function HomeLoggedOut({ session, onDashboard }) {
   const reduce = useReducedMotion();
   const router = useRouter();
   const time = useCountdown(new Date(event.hackathonStart));
 
-  const handleRegister = () => router.push('/login');
+  const handleRegister = () => {
+    if (session && onDashboard) {
+      onDashboard();
+    } else {
+      router.push('/login');
+    }
+  };
   const scrollToAbout = () => document.getElementById('about-section')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
@@ -186,7 +192,7 @@ export default function HomeLoggedOut() {
         <div className="relative z-10 flex-1 max-w-9xl mx-auto w-full flex flex-col lg:flex-row items-center gap-8 px-4 sm:px-6 py-10 sm:py-16 lg:py-0">
 
           {/* LEFT: Main window card */}
-          <motion.div className="flex-1 mb-[7vh] mt-[4vh] w-full ml-[7vw] max-w-xl"
+          <motion.div className="flex-1 mb-[7vh] mt-[4vh] w-full mx-auto lg:ml-[7vw] max-w-xl"
             initial={{ opacity: 0, y: reduce ? 0 : 60 }} animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.15 }}>
             <WindowCard logo="codeforge™">
@@ -221,7 +227,9 @@ export default function HomeLoggedOut() {
 
                 {/* CTA buttons */}
                 <div className="flex flex-wrap gap-3">
-                  <Y2KButton onClick={handleRegister}>Register Now</Y2KButton>
+                  <Y2KButton onClick={handleRegister}>
+                    {session ? 'Dashboard' : 'Register Now'}
+                  </Y2KButton>
                   <Y2KButton onClick={scrollToAbout} variant="secondary">Learn More</Y2KButton>
                 </div>
 
@@ -235,14 +243,14 @@ export default function HomeLoggedOut() {
           </motion.div>
 
           {/* RIGHT: Countdown window */}
-          <motion.div className="w-full max-w-xs ml-[12vw] lg:max-w-sm"
+          <motion.div className="w-full max-w-xs mx-auto lg:ml-[12vw] lg:max-w-sm"
             initial={{ opacity: 0, y: reduce ? 0 : 60 }} animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING, delay: 0.3 }}>
             <WindowCard logo="event-timer.exe">
               <div className="p-5">
                 <p className="text-xs font-black uppercase tracking-widest mb-4 text-center"
                   style={{ fontFamily: 'var(--y2k-font-mono)', color: '#64748B' }}>
-                  ⏳ EVENT STARTS IN
+                 EVENT STARTS IN
                 </p>
 
                 {/* Timer grid */}

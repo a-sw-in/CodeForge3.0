@@ -10,6 +10,7 @@ import HomeLoggedOut from './components/HomeLoggedOut';
 export default function UHackathonLanding() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
     // Check for active session and validate against database
@@ -40,12 +41,16 @@ export default function UHackathonLanding() {
             // Team deleted from database, clear session
             localStorage.removeItem('teamSession');
             setSession(null);
+            setShowDashboard(false);
           }
         } catch (err) {
           // Invalid session data, clear it
           localStorage.removeItem('teamSession');
           setSession(null);
+          setShowDashboard(false);
         }
+      } else {
+        setShowDashboard(false);
       }
       setLoading(false);
     };
@@ -147,7 +152,17 @@ export default function UHackathonLanding() {
   return (
     <>
       <LoginButton />
-      {session ? <HomeLoggedIn session={session} /> : <HomeLoggedOut />}
+      {showDashboard && session ? (
+        <HomeLoggedIn 
+          session={session} 
+          onBack={() => setShowDashboard(false)} 
+        />
+      ) : (
+        <HomeLoggedOut 
+          session={session} 
+          onDashboard={() => setShowDashboard(true)} 
+        />
+      )}
     </>
   );
 }
