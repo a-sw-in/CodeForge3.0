@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconHash, IconUpload, IconX } from '@tabler/icons-react';
+import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconHash, IconUpload, IconX, IconPhone } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -14,12 +14,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState('');
   const [yearOfStudy, setYearOfStudy] = useState('');
   const [additionalMembers, setAdditionalMembers] = useState([]);
   const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
-  const [currentMemberData, setCurrentMemberData] = useState({ name: '', email: '', yearOfStudy: '' });
+  const [currentMemberData, setCurrentMemberData] = useState({ name: '', email: '', phone: '', yearOfStudy: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentScreenshots, setPaymentScreenshots] = useState([]);
@@ -131,7 +132,7 @@ export default function LoginPage() {
     if (currentMemberIndex + 1 < additionalMembersNeeded) {
       // More members to add
       setCurrentMemberIndex(currentMemberIndex + 1);
-      setCurrentMemberData({ name: '', email: '', yearOfStudy: '' });
+      setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '' });
     } else {
       // All members added, move to payment step
       setStep('payment');
@@ -214,18 +215,22 @@ export default function LoginPage() {
         // Leader (Member 1)
         leader_name: name,
         leader_email: email,
+        leader_phone: phone,
         leader_year: yearOfStudy,
         // Member 2
         member2_name: members[0]?.name || null,
         member2_email: members[0]?.email || null,
+        member2_phone: members[0]?.phone || null,
         member2_year: members[0]?.yearOfStudy || null,
         // Member 3
         member3_name: members[1]?.name || null,
         member3_email: members[1]?.email || null,
+        member3_phone: members[1]?.phone || null,
         member3_year: members[1]?.yearOfStudy || null,
         // Member 4
         member4_name: members[2]?.name || null,
         member4_email: members[2]?.email || null,
+        member4_phone: members[2]?.phone || null,
         member4_year: members[2]?.yearOfStudy || null,
         approved: false,
         created_at: new Date().toISOString(),
@@ -279,19 +284,20 @@ export default function LoginPage() {
         setStep('register');
         setCurrentMemberIndex(0);
         setAdditionalMembers([]);
-        setCurrentMemberData({ name: '', email: '', yearOfStudy: '' });
+        setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '' });
       }
     } else {
       setStep('email');
       setError('');
       setPassword('');
       setName('');
+      setPhone('');
       setTeamName('');
       setTeamMembers('');
       setYearOfStudy('');
       setAdditionalMembers([]);
       setCurrentMemberIndex(0);
-      setCurrentMemberData({ name: '', email: '', yearOfStudy: '' });
+      setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '' });
       setPaymentScreenshots([]);
     }
   };
@@ -661,6 +667,40 @@ export default function LoginPage() {
               <div className="mb-3">
                 <label className="block text-xs font-bold uppercase mb-1.5" 
                   style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconPhone className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                    pattern="[0-9]{10}"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
+                    placeholder="9876543210"
+                    disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
+                  />
+                </div>
+                <p className="text-xs mt-1" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#64748B' }}>
+                  Enter 10-digit phone number
+                </p>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
                   Team Name
                 </label>
                 <div className="relative">
@@ -912,6 +952,40 @@ export default function LoginPage() {
                     onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                 </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="block text-xs font-bold uppercase mb-1.5" 
+                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
+                    <IconPhone className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="tel"
+                    value={currentMemberData.phone}
+                    onChange={(e) => setCurrentMemberData({ ...currentMemberData, phone: e.target.value })}
+                    required
+                    pattern="[0-9]{10}"
+                    className="w-full pl-10 pr-3 py-2 text-xs font-medium"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      outline: 'none',
+                    }}
+                    placeholder="9876543210"
+                    disabled={loading}
+                    onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
+                  />
+                </div>
+                <p className="text-xs mt-1" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#64748B' }}>
+                  Enter 10-digit phone number
+                </p>
               </div>
 
               <div className="mb-5">

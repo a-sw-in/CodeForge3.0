@@ -667,6 +667,26 @@ export default function AdminDashboard({ inTabView = false }) {
                       <div>
                         <label className="block text-xs font-bold uppercase mb-2" 
                           style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          value={editedTeam?.leader_phone || ''}
+                          onChange={(e) => handleFieldChange('leader_phone', e.target.value)}
+                          disabled={!isEditing}
+                          className="w-full px-4 py-2 text-sm font-medium"
+                          style={{
+                            fontFamily: 'var(--y2k-font-ui)',
+                            background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                            color: '#001A6E',
+                            border: '3px solid #001A6E',
+                            outline: 'none',
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase mb-2" 
+                          style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
                           Year of Study
                         </label>
                         <input
@@ -724,6 +744,26 @@ export default function AdminDashboard({ inTabView = false }) {
                             type="email"
                             value={editedTeam?.member2_email || ''}
                             onChange={(e) => handleFieldChange('member2_email', e.target.value)}
+                            disabled={!isEditing}
+                            className="w-full px-4 py-2 text-sm font-medium"
+                            style={{
+                              fontFamily: 'var(--y2k-font-ui)',
+                              background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                              color: '#001A6E',
+                              border: '3px solid #001A6E',
+                              outline: 'none',
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            value={editedTeam?.member2_phone || ''}
+                            onChange={(e) => handleFieldChange('member2_phone', e.target.value)}
                             disabled={!isEditing}
                             className="w-full px-4 py-2 text-sm font-medium"
                             style={{
@@ -810,6 +850,26 @@ export default function AdminDashboard({ inTabView = false }) {
                         <div>
                           <label className="block text-xs font-bold uppercase mb-2" 
                             style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            value={editedTeam?.member3_phone || ''}
+                            onChange={(e) => handleFieldChange('member3_phone', e.target.value)}
+                            disabled={!isEditing}
+                            className="w-full px-4 py-2 text-sm font-medium"
+                            style={{
+                              fontFamily: 'var(--y2k-font-ui)',
+                              background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                              color: '#001A6E',
+                              border: '3px solid #001A6E',
+                              outline: 'none',
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
                             Year of Study
                           </label>
                           <input
@@ -868,6 +928,26 @@ export default function AdminDashboard({ inTabView = false }) {
                             type="email"
                             value={editedTeam?.member4_email || ''}
                             onChange={(e) => handleFieldChange('member4_email', e.target.value)}
+                            disabled={!isEditing}
+                            className="w-full px-4 py-2 text-sm font-medium"
+                            style={{
+                              fontFamily: 'var(--y2k-font-ui)',
+                              background: isEditing ? '#FFFFFF' : '#F1F5F9',
+                              color: '#001A6E',
+                              border: '3px solid #001A6E',
+                              outline: 'none',
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold uppercase mb-2" 
+                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            value={editedTeam?.member4_phone || ''}
+                            onChange={(e) => handleFieldChange('member4_phone', e.target.value)}
                             disabled={!isEditing}
                             className="w-full px-4 py-2 text-sm font-medium"
                             style={{

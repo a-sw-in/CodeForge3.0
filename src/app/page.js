@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
+import { isValidSessionStructure, sanitizeObject, detectXSS } from '@/lib/security';
 import LoginButton from './components/LoginButton';
 import HomeLoggedIn from './components/HomeLoggedIn';
 import HomeLoggedOut from './components/HomeLoggedOut';
@@ -20,11 +21,34 @@ export default function UHackathonLanding() {
         try {
           const parsedSession = JSON.parse(sessionData);
           
+          // Security validation: Check session structure
+          if (!isValidSessionStructure(parsedSession)) {
+            console.error('Invalid session structure detected');
+            localStorage.removeItem('teamSession');
+            setSession(null);
+            setShowDashboard(false);
+            setLoading(false);
+            return;
+          }
+          
+          // Security validation: Check for XSS attempts
+          if (detectXSS(JSON.stringify(parsedSession))) {
+            console.error('XSS attempt detected in session data');
+            localStorage.removeItem('teamSession');
+            setSession(null);
+            setShowDashboard(false);
+            setLoading(false);
+            return;
+          }
+          
+          // Sanitize session data
+          const sanitizedSession = sanitizeObject(parsedSession);
+          
           // Validate session against database
           const { data: teamData, error } = await supabase
             .from('teams')
             .select('team_id, team_name, leader_email, total_members, approved')
-            .eq('leader_email', parsedSession.leaderEmail)
+            .eq('leader_email', sanitizedSession.leaderEmail)
             .single();
           
           if (teamData && !error) {
@@ -45,6 +69,7 @@ export default function UHackathonLanding() {
           }
         } catch (err) {
           // Invalid session data, clear it
+          console.error('Session validation error:', err);
           localStorage.removeItem('teamSession');
           setSession(null);
           setShowDashboard(false);

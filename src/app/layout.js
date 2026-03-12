@@ -1,6 +1,7 @@
 'use client';
 
 import { Outfit, Plus_Jakarta_Sans, Press_Start_2P } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import LoadingWrapper from "../ui/LoadingWrapper";
 import FloatingDockDemo from "../ui/floating-demo";
@@ -31,6 +32,13 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
+      <head>
+        {/* Security Script - Load early to protect against console manipulation */}
+        <Script
+          src="/security.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body
         className={`${pressStart2P.variable} ${outfit.variable} ${plusJakarta.variable} antialiased`}
         style={{ background: '#FFFDF5' }}
