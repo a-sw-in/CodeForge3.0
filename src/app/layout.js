@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Outfit, Plus_Jakarta_Sans, Press_Start_2P } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -29,6 +30,11 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const isTimerRoute = pathname === '/timer';
+
+  // Set page title
+  useEffect(() => {
+    document.title = 'CodeForge 3.0';
+  }, []);
 
   return (
     <html lang="en">

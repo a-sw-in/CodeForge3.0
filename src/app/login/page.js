@@ -29,6 +29,7 @@ export default function LoginPage() {
   const [paymentScreenshots, setPaymentScreenshots] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [copiedUPI, setCopiedUPI] = useState(false);
 
   // Detect if device is mobile
   useEffect(() => {
@@ -92,8 +93,8 @@ export default function LoginPage() {
     }
     
     // UPI format: upi://pay?pa=UPI_ID&pn=NAME&am=AMOUNT&tn=NOTE&tr=REFERENCE
-    // Include phone number in the note for better tracking
-    const note = `CodeForge-${totalFee}-${phone || 'N/A'}`;
+    // Include team name in the note for better tracking
+    const note = `CodeForge-${totalFee}-${teamName || 'N/A'}`;
     const transactionRef = `CF3-${Date.now()}-${teamName.substring(0, 5)}`.replace(/\s/g, '');
     
     const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${totalFee}&tn=${encodeURIComponent(note)}&tr=${transactionRef}`;
@@ -981,28 +982,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <div className="mb-5 p-3"
-                style={{
-                  background: '#F0F9FF',
-                  border: '3px solid #0055FF',
-                  boxShadow: '3px 3px 0px #001A6E'
-                }}>
-                <p className="text-xs font-bold uppercase mb-2" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                  💰 Fee Breakdown
-                </p>
-                <p className="text-xs mb-1" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                  Team Size: <strong>{teamMembers} Member{parseInt(teamMembers) > 1 ? 's' : ''}</strong>
-                </p>
-                <p className="text-xs mb-2" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                  {isIEEEMember ? '✓ IEEE Member' : '• Non-IEEE Member'}: <strong>₹{isIEEEMember ? '399' : '499'} per person</strong>
-                </p>
-                <div className="pt-2 mt-2" style={{ borderTop: '2px solid #0055FF' }}>
-                  <p className="text-sm font-bold" style={{ fontFamily: 'var(--y2k-font-display)', color: '#0055FF' }}>
-                    Estimated Total: ₹{calculateTotalFee()}
-                  </p>
-                </div>
-              </div>
-
               <div className="flex gap-2">
                 <motion.button
                   type="button"
@@ -1473,7 +1452,7 @@ export default function LoginPage() {
                         background: '#FFFFFF',
                         border: '2px solid #0055FF',
                         fontFamily: 'var(--y2k-font-ui)',
-                        color: process.env.NEXT_PUBLIC_UPI_ID ? '#0055FF' : '#FF6B6B'
+                        color: process.env.NEXT_PUBLIC_UPI_ID ? '#000000' : '#FF6B6B'
                       }}>
                       <code className="flex-1 text-xs font-mono font-bold">
                         {process.env.NEXT_PUBLIC_UPI_ID || '⚠️ Configure .env.local'}
@@ -1483,17 +1462,18 @@ export default function LoginPage() {
                           type="button"
                           onClick={() => {
                             navigator.clipboard.writeText(process.env.NEXT_PUBLIC_UPI_ID);
-                            alert('UPI ID copied to clipboard!');
+                            setCopiedUPI(true);
+                            setTimeout(() => setCopiedUPI(false), 5000);
                           }}
                           className="px-2 py-1 text-xs font-bold rounded"
                           style={{
-                            background: '#0055FF',
+                            background: '#24ac15',
                             color: '#FFFFFF',
                             border: 'none',
                             cursor: 'pointer'
                           }}
                         >
-                          Copy
+                          {copiedUPI ? 'Copied!' : 'Copy'}
                         </button>
                       )}
                     </div>
