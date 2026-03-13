@@ -116,7 +116,7 @@ async function sendTicketEmail(teamData, ticketPDF, ticketNumber) {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎉 Welcome to CodeForge 3.0!</h1>
+              <h1>Welcome to CodeForge 3.0!</h1>
             </div>
             
             <div class="content">
