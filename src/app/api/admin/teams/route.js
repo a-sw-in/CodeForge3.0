@@ -36,6 +36,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
           
           <p>
             <strong>Team Details</strong><br>
+            Team Name: ${teamData.team_name}<br>
             Team ID: #${teamData.team_id}<br>
             Team Size: ${teamData.total_members} members<br>
             Leader: ${teamData.leader_name}
@@ -60,7 +61,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
       name: teamData.leader_name 
     }];
     sendSmtpEmail.sender = { 
-      email: process.env.BREVO_SENDER_EMAIL || 'noreply@codeforge3.com',
+      email: process.env.BREVO_SENDER_EMAIL,
       name: process.env.BREVO_SENDER_NAME || 'CodeForge 3.0' 
     };
     sendSmtpEmail.subject = '🎉 Your CodeForge 3.0 Ticket is Ready!';

@@ -156,13 +156,13 @@ page.drawText('Footer text', { x: 40, y: 40 });
 
 ## 🔧 Sender Email Setup
 
-**Current sender:** `aswinsanthoshachus@gmail.com`
+**Current sender:** `codeforge.ieee@gmail.com`
 
 ### To Verify Sender in Brevo:
 1. Go to [Brevo Dashboard](https://app.brevo.com)
 2. Navigate to **Senders & IP**
 3. Click **Add a Sender**
-4. Add `aswinsanthoshachus@gmail.com`
+4. Add `codeforge.ieee@gmail.com`
 5. Verify via email confirmation link
 
 ---

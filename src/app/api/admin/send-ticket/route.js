@@ -172,7 +172,7 @@ async function sendTicketEmail(teamData, ticketPDF, ticketNumber) {
       name: teamData.leader_name 
     }];
     sendSmtpEmail.sender = { 
-      email: process.env.BREVO_SENDER_EMAIL || 'noreply@codeforge3.com',
+      email: process.env.BREVO_SENDER_EMAIL,
       name: process.env.BREVO_SENDER_NAME || 'CodeForge 3.0' 
     };
     sendSmtpEmail.subject = `🎉 Your CodeForge 3.0 Ticket is Ready! (${ticketNumber})`;

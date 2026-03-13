@@ -27,8 +27,8 @@ npm install @sendinblue/client
 
 ### 5. Configure Sender Email
 1. In Brevo dashboard, go to **Senders**
-2. Add and verify your sender email (e.g., noreply@yourdomain.com)
-3. Update the sender email in the API code
+2. Add and verify your sender email (e.g., codeforge.ieee@gmail.com)
+3. Update BREVO_SENDER_EMAIL in .env.local
 
 ## Implementation
 
@@ -56,7 +56,7 @@ async function sendTicketEmail(teamData, ticketSVG) {
   }];
   
   sendSmtpEmail.sender = { 
-    email: 'noreply@codeforge.com', // Update with your verified sender
+    email: process.env.BREVO_SENDER_EMAIL, // Use BREVO_SENDER_EMAIL from .env
     name: 'CodeForge 3.0' 
   };
   
