@@ -853,6 +853,13 @@ export default function LoginPage() {
                       color: '#001A6E',
                       border: '3px solid #001A6E',
                       outline: 'none',
+                      WebkitAppearance: 'none',
+                      appearance: 'none',
+                      paddingRight: '24px',
+                      backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23001A6E%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%3e%3c/polyline%3e%3c/svg%3e")',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '16px',
                     }}
                     disabled={loading}
                     onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
@@ -886,6 +893,13 @@ export default function LoginPage() {
                       color: '#001A6E',
                       border: '3px solid #001A6E',
                       outline: 'none',
+                      WebkitAppearance: 'none',
+                      appearance: 'none',
+                      paddingRight: '24px',
+                      backgroundImage: 'url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27%23001A6E%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%3e%3c/polyline%3e%3c/svg%3e")',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 8px center',
+                      backgroundSize: '16px',
                     }}
                     disabled={loading}
                     onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}

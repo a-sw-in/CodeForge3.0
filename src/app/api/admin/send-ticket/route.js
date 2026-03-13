@@ -125,7 +125,7 @@ async function sendTicketEmail(teamData, ticketPDF, ticketNumber) {
               <p>Congratulations! Your team <strong>${teamData.team_name}</strong> has been approved for CodeForge 3.0.</p>
               
               <div class="info-box">
-                <strong>📋 Team Details:</strong><br>
+                <strong> Team Details:</strong><br>
                 Team Name: ${teamData.team_name}<br>
                 Team ID: #${teamData.team_id}<br>
                 Team Size: ${teamData.total_members} members<br>
