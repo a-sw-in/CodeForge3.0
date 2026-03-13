@@ -1590,7 +1590,7 @@ export default function LoginPage() {
                   whileHover={!loading ? { x: -2, y: -2, boxShadow: '6px 6px 0px #001A6E' } : {}}
                   whileTap={!loading ? { x: 2, y: 2, boxShadow: '2px 2px 0px #001A6E' } : {}}
                 >
-                  {loading ? 'Completing...' : 'Complete Registration'}
+                  {loading ? 'Uploading...' : 'Completed..'}
                   <IconArrowRight className="w-3.5 h-3.5" strokeWidth={3} />
                 </motion.button>
               </div>

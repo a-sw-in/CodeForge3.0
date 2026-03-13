@@ -15,14 +15,14 @@ const LoadingWrapper = ({ children }) => {
       // Start transition, then hide loading after transition completes
       setTimeout(() => {
         setIsLoading(false);
-      }, 1500); // Transition duration
-    }, 5000); // 5 seconds
+      }, 750); // Transition duration
+    }, 2500); // 2.5 seconds
 
     return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
-    return <LoadingUI duration={5000} onComplete={() => setIsTransitioning(true)} isTransitioning={isTransitioning} />;
+    return <LoadingUI duration={2500} onComplete={() => setIsTransitioning(true)} isTransitioning={isTransitioning} />;
   }
 
   return (
@@ -42,7 +42,7 @@ const LoadingWrapper = ({ children }) => {
           rotateX: 0
         }}
         transition={{ 
-          duration: 1.5,
+          duration: 0.75,
           ease: [0.25, 0.46, 0.45, 0.94],
           staggerChildren: 0.1
         }}

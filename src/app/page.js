@@ -94,75 +94,38 @@ export default function UHackathonLanding() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-        {/* Animated background shapes */}
-        <motion.div 
-          className="absolute inset-0 overflow-hidden pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-          transition={{ duration: 1 }}
-        >
-          <motion.div 
-            className="absolute top-20 left-10 w-32 h-32 border border-purple-500/30 rounded-full"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360]
-            }}
-            transition={{ 
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-          <motion.div 
-            className="absolute top-40 right-20 w-20 h-20 border border-purple-400/40 rounded-full"
-            animate={{ 
-              scale: [1, 1.5, 1],
-              opacity: [0.4, 1, 0.4]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div 
-            className="absolute bottom-40 left-20 w-16 h-16 bg-purple-600/20 rounded-full"
-            animate={{ 
-              y: [0, -20, 0]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </motion.div>
-
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: '#FFFDF5' }}>
         {/* Loading content */}
         <motion.div
           className="relative z-10 text-center"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
         >
-          {/* Spinner */}
+          {/* Loading bar */}
           <motion.div
-            className="w-16 h-16 mx-auto mb-6 border-4 border-purple-500/20 border-t-purple-500 rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ 
-              duration: 1,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
+            className="w-32 h-2 mx-auto mb-6 relative overflow-hidden"
+            style={{ border: '3px solid #001A6E', background: '#FFFFFF', boxShadow: '3px 3px 0px #001A6E' }}
+          >
+            <motion.div
+              className="h-full"
+              style={{ background: '#CCFF00' }}
+              animate={{ x: ['-100%', '100%'] }}
+              transition={{ 
+                duration: 0.8,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+          </motion.div>
           
           {/* Loading text */}
           <motion.div
-            className="text-purple-300 text-lg font-semibold"
+            className="font-bold uppercase text-sm"
+            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ 
-              duration: 1.5,
+              duration: 1.2,
               repeat: Infinity,
               ease: "easeInOut"
             }}
