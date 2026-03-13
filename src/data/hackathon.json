@@ -8,7 +8,7 @@
         "dateDisplay": "March 2026",
         "location": "UCEK · TVM",
         "duration": "24 Hours",
-        "registrationDeadline": "2026-03-02T09:00:00",
+        "registrationDeadline": "2026-03-20T09:00:00",
         "hackathonStart": "2026-03-22T09:00:00",
         "email": "ieeesbucek@gmail.com",
         "phone": "+91 62380 67296",
@@ -54,7 +54,7 @@
     "schedule": [
         {
             "title": "Registration Opens",
-            "date": "MAR 20",
+            "date": "MAR 13",
             "year": "2026",
             "description": "Kick off your CodeForge 3.0 journey! Registration is now open for all participants.",
             "color": "#CCFF00",
@@ -62,7 +62,7 @@
         },
         {
             "title": "Registration Closes",
-            "date": "APR 10",
+            "date": "MAR 20",
             "year": "2026",
             "description": "Final call to join the hackathon. Don't miss your chance to be part of the challenge!",
             "color": "#00CCFF",
@@ -70,7 +70,7 @@
         },
         {
             "title": "Shortlisting",
-            "date": "APR 12",
+            "date": "MAR 21",
             "year": "2026",
             "description": "Submitted team profiles and ideas will be reviewed. Shortlisted teams will move forward to the hackathon.",
             "color": "#FF44AA",
@@ -78,7 +78,7 @@
         },
         {
             "title": "Hackathon Kickoff",
-            "date": "APR 15",
+            "date": "MAR 22",
             "year": "2026",
             "description": "The hackathon begins. Start building your project and turn your idea into a working solution.",
             "color": "#CCFF00",
@@ -86,7 +86,7 @@
         },
         {
             "title": "Hackathon Ends",
-            "date": "APR 16",
+            "date": "MAR 23",
             "year": "2026",
             "description": "Submit your project before the deadline. Make sure everything is ready for review.",
             "color": "#00CCFF",
@@ -94,7 +94,7 @@
         },
         {
             "title": "Results & Awards",
-            "date": "APR 18",
+            "date": "MAR 23",
             "year": "2026",
             "description": "Winners announced and prizes awarded in a live ceremony.",
             "color": "#FF44AA",
@@ -137,9 +137,9 @@
     ],
     "pastEvents": [
         {
-            "name": "TechFest 2024",
-            "description": "Annual festival — coding competitions, workshops, tech talks.",
-            "date": "Mar 2024"
+            "name": "GRAND QUEST AUTO",
+            "description": "Techno tresure hunt in collab with legacy IEDC,Mulearn UCEK,GDG UCEK",
+            "date": "Mar 2026"
         },
         {
             "name": "AI Workshop Series",
