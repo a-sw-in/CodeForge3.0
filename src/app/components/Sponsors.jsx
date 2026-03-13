@@ -40,7 +40,7 @@ export default function Sponsors() {
               <BlinkDot color="#FF44AA" />
               <span className="flex-1 font-black text-xs uppercase tracking-widest truncate"
                 style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>
-                Sponsors_Gallery — {sponsorsData.length} partners
+                Sponsors Gallery
               </span>
               <div className="flex gap-1 shrink-0">
                 {['—', '□', '✕'].map(c => (
