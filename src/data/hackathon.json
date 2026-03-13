@@ -137,34 +137,16 @@
     ],
     "sponsors": [
         {
-            "name": "Sponsor One",
-            "logo": "/sponsors/sponsor1.png",
-            "category": "Platinum Partner"
+            "name": "Regal Jewellers",
+            "logo": "/sponsors/sponsor1.jpeg",
+            "category": "Title Sponsor",
+            "caption": "Assistant marketing manager - +91 90486 49990"
         },
         {
-            "name": "Sponsor Two",
-            "logo": "/sponsors/sponsor2.png",
-            "category": "Gold Partner"
-        },
-        {
-            "name": "Sponsor Three",
-            "logo": "/sponsors/sponsor3.png",
-            "category": "Silver Partner"
-        },
-        {
-            "name": "Sponsor Four",
-            "logo": "/sponsors/sponsor4.png",
-            "category": "Bronze Partner"
-        },
-        {
-            "name": "Sponsor Five",
-            "logo": "/sponsors/sponsor5.png",
-            "category": "Partner"
-        },
-        {
-            "name": "Sponsor Six",
-            "logo": "/sponsors/sponsor6.png",
-            "category": "Partner"
+            "name": "Luv Cut Let Sreekariyam",
+            "logo": "/sponsors/sponsor2.jpeg",
+            "category": "Gold Sponsor",
+            "caption": ""
         }
     ],
     "pastEvents": [

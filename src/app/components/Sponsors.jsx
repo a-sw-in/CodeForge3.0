@@ -107,7 +107,7 @@ export default function Sponsors() {
 
                   {sponsor.category && (
                     <div
-                      className="px-2 py-1 text-xs font-black uppercase text-center"
+                      className="px-2 py-1 text-xs font-black uppercase text-center mb-2"
                       style={{
                         background: color,
                         color: textColor,
@@ -116,6 +116,16 @@ export default function Sponsors() {
                       }}>
                       {sponsor.category}
                     </div>
+                  )}
+
+                  {sponsor.caption && (
+                    <p className="text-xs text-center italic"
+                      style={{
+                        color: '#64748B',
+                        fontFamily: 'var(--y2k-font-ui)',
+                      }}>
+                      {sponsor.caption}
+                    </p>
                   )}
                 </div>
               </motion.div>
