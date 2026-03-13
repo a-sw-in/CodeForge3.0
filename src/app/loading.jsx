@@ -60,8 +60,8 @@ const Loading = () => {
           <div className="p-8">
             {/* Brand */}
             <div className="mb-2">
-              <h1 className="text-6xl font-black uppercase leading-none"
-                style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', letterSpacing: '-0.01em' }}>
+              <h1 className="font-black uppercase leading-none"
+                style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', letterSpacing: '-0.01em', fontSize: '3.375rem' }}>
                 CODEFORGE
               </h1>
               <div className="flex items-center gap-3">
