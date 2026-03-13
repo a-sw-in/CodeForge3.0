@@ -62,7 +62,7 @@ export default function Sponsors() {
         </motion.div>
 
         {/* Sponsors Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="relative flex justify-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center">
           {sponsorsData.map((sponsor, idx) => {
             const colors = ['#CCFF00', '#00CCFF', '#FF44AA', '#CCFF00', '#00CCFF', '#FF44AA'];
             const color = colors[idx % colors.length];
@@ -78,7 +78,7 @@ export default function Sponsors() {
                   boxShadow: '4px 4px 0px rgba(0,26,110,0.2)',
                   transition: 'all 0.2s ease',
                 }}
-                  className="hover:shadow-lg p-6 flex flex-col items-center justify-center min-h-[240px]"
+                  className="hover:shadow-lg p-6 flex flex-col items-center justify-center min-h-[240px] w-full max-w-sm"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.boxShadow = `4px 4px 0px ${color}`;
                     e.currentTarget.style.transform = 'translate(-2px, -2px)';
