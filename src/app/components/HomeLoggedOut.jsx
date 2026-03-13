@@ -363,7 +363,7 @@ export default function HomeLoggedOut({ session, onDashboard }) {
       <div id="schedule-section"><ScheduleTimeline /></div>
       <div id="register-section"><RulesAndFAQ /></div>
       {/*<div id="sponsors-section"><Sponsors /></div>*/}
-      <Footer />
+      <Footer session={session} />
     </div>
   );
 }

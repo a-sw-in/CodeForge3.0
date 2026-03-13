@@ -18,7 +18,7 @@ const SOCIAL = [
   { Icon: IconBrandLinkedin, c: '#00CCFF', label: 'LI', href: event.social.linkedin },
 ];
 
-const Footer = () => {
+const Footer = ({ session }) => {
   const reduce = useReducedMotion();
 
   return (
@@ -47,34 +47,36 @@ const Footer = () => {
             </h2>
           </motion.div>
 
-          {/* Right: register.exe box */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-            transition={{ ...SPRING, delay: 0.15 }} viewport={{ once: true }}
-            className="w-full lg:ml-[9vw] lg:w-auto shrink-0">
-            <div style={{ border: '3px solid #CCFF00', background: '#ffffffff', boxShadow: '6px 6px 0px rgba(255,255,255,0.3)' }}>
-              <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '3px solid #001A6E', background: '#CCFF00' }}>
-                <span className="font-black text-xs uppercase tracking-widest" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>register.exe</span>
-                <div className="w-4 h-4 bg-white flex items-center justify-center font-black text-xs" style={{ border: '1.5px solid #001A6E', color: '#001A6E' }}>✕</div>
+          {/* Right: register.exe box - only show when NOT logged in */}
+          {!session && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+              transition={{ ...SPRING, delay: 0.15 }} viewport={{ once: true }}
+              className="w-full lg:ml-[9vw] lg:w-auto shrink-0">
+              <div style={{ border: '3px solid #CCFF00', background: '#ffffffff', boxShadow: '6px 6px 0px rgba(255,255,255,0.3)' }}>
+                <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '3px solid #001A6E', background: '#CCFF00' }}>
+                  <span className="font-black text-xs uppercase tracking-widest" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>register.exe</span>
+                  <div className="w-4 h-4 bg-white flex items-center justify-center font-black text-xs" style={{ border: '1.5px solid #001A6E', color: '#001A6E' }}>✕</div>
+                </div>
+                <div className="px-5 sm:px-6 py-4 sm:py-5">
+                  <p className="text-xs font-black uppercase tracking-widest mb-1" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#64748B' }}>
+                    {event.duration} HACKATHON
+                  </p>
+                  <p className="text-2xl sm:text-3xl font-black uppercase leading-tight mb-4"
+                    style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>
+                    {event.dateDisplay.toUpperCase()}<br />{event.location}
+                  </p>
+                  <motion.a href="/login"
+                    className="flex items-center gap-2 px-5 py-2.5 font-black text-sm uppercase w-full justify-center"
+                    style={{ background: '#0055FF', color: '#FFFFFF', border: '3px solid #001A6E', boxShadow: '3px 3px 0px #001A6E', fontFamily: 'var(--y2k-font-ui)', letterSpacing: '0.05em' }}
+                    whileHover={{ x: -2, y: -2, boxShadow: '5px 5px 0px #001A6E', transition: { duration: 0.15 } }}
+                    whileTap={{ x: 1, y: 1, boxShadow: '1px 1px 0px #001A6E' }}>
+                    Register Free <IconArrowRight size={14} strokeWidth={3} />
+                  </motion.a>
+                </div>
               </div>
-              <div className="px-5 sm:px-6 py-4 sm:py-5">
-                <p className="text-xs font-black uppercase tracking-widest mb-1" style={{ fontFamily: 'var(--y2k-font-mono)', color: '#64748B' }}>
-                  {event.duration} HACKATHON
-                </p>
-                <p className="text-2xl sm:text-3xl font-black uppercase leading-tight mb-4"
-                  style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E' }}>
-                  {event.dateDisplay.toUpperCase()}<br />{event.location}
-                </p>
-                <motion.a href="/login"
-                  className="flex items-center gap-2 px-5 py-2.5 font-black text-sm uppercase w-full justify-center"
-                  style={{ background: '#0055FF', color: '#FFFFFF', border: '3px solid #001A6E', boxShadow: '3px 3px 0px #001A6E', fontFamily: 'var(--y2k-font-ui)', letterSpacing: '0.05em' }}
-                  whileHover={{ x: -2, y: -2, boxShadow: '5px 5px 0px #001A6E', transition: { duration: 0.15 } }}
-                  whileTap={{ x: 1, y: 1, boxShadow: '1px 1px 0px #001A6E' }}>
-                  Register Free <IconArrowRight size={14} strokeWidth={3} />
-                </motion.a>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       </div>
 
