@@ -137,34 +137,34 @@
     ],
     "pastEvents": [
         {
-            "name": "GRAND QUEST AUTO",
-            "description": "Techno tresure hunt in collab with legacy IEDC,Mulearn UCEK,GDG UCEK",
-            "date": "Mar 2026"
+            "name": "SPHOTA",
+            "description": "SPHOTA is a 24-hour offline hackathon organized by IEEE SB UCEK and IEEE SB STIST.",
+            "date": "Aug 2025"
         },
         {
-            "name": "AI Workshop Series",
-            "description": "ML and Artificial Intelligence deep-dive workshop series.",
-            "date": "Jan 2024"
+            "name": "INTRODUCTION TO JAVA",
+            "description": "introduction to java session conducted as part of the event RYOKEI TENKAI speaker AARON RAJESH",
+            "date": "Oct 2024"
         },
         {
             "name": "CodeForge 2.0",
             "description": "Previous flagship hackathon — 200+ participants.",
-            "date": "Nov 2023"
+            "date": "Feb 2024"
         },
         {
-            "name": "Robotics Championship",
-            "description": "Inter-college robotics competition, autonomous & manual.",
-            "date": "Sep 2023"
+            "name": "Blockchain Technologies",
+            "description": "Fundamentals of Blockchain by SAGARA. MR Assistant professor CSE STIST.",
+            "date": "Sep 2025"
         },
         {
-            "name": "Web Dev Bootcamp",
-            "description": "3-day bootcamp on modern web development.",
-            "date": "Jul 2023"
+            "name": "TECH UNLEASHED",
+            "description": "A program conducted to unleash the potential of students.",
+            "date": "Nov 2024"
         },
         {
-            "name": "Cybersecurity Week",
-            "description": "Week-long cybersecurity awareness and workshops.",
-            "date": "Jun 2023"
+            "name": "LEARNING HUB",
+            "description": "Designed to revolutionize student learning and developmeant",
+            "date": "Aug 2024"
         }
     ]
 }
