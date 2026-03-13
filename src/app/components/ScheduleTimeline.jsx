@@ -21,7 +21,7 @@ export default function ScheduleTimeline() {
           initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
           transition={SPRING} viewport={{ once: true }}>
           <div>
-            <h2 className="text-6xl sm:text-7xl md:text-[100px] font-black uppercase leading-none text-white"
+            <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-[100px] font-black uppercase leading-none text-white"
               style={{ fontFamily: 'var(--y2k-font-display)', letterSpacing: '-0.02em' }}>
               SCHEDULE
             </h2>

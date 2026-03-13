@@ -5,30 +5,42 @@ import { IconTrophy, IconMedal, IconAward, IconStar } from '@tabler/icons-react'
 
 const SPRING = { type: 'spring', stiffness: 300, damping: 24 };
 
+// Individual prizes commented out - replaced with single prize pool
+// const prizes = [
+//   {
+//     title: 'First Place',
+//     amount: '₹6,000',
+//     icon: IconTrophy,
+//     color: '#CCFF00',
+//     textColor: '#001A6E',
+//     description: 'Grand prize + Certificate + Mentorship opportunity',
+//   },
+//   {
+//     title: 'Second Place',
+//     amount: '₹3,000',
+//     icon: IconMedal,
+//     color: '#00CCFF',
+//     textColor: '#001A6E',
+//     description: 'Runner-up prize + Certificate + Goodies',
+//   },
+//   {
+//     title: 'Third Place',
+//     amount: '₹1,500',
+//     icon: IconAward,
+//     color: '#FF44AA',
+//     textColor: '#FFFFFF',
+//     description: 'Prize + Certificate + Exclusive merch',
+//   },
+// ];
+
 const prizes = [
   {
-    title: 'First Place',
-    amount: '₹8,000',
+    title: 'Prize Pool',
+    amount: '₹12,000',
     icon: IconTrophy,
     color: '#CCFF00',
     textColor: '#001A6E',
-    description: 'Grand prize + Certificate + Mentorship opportunity',
-  },
-  {
-    title: 'Second Place',
-    amount: '₹5,000',
-    icon: IconMedal,
-    color: '#00CCFF',
-    textColor: '#001A6E',
-    description: 'Runner-up prize + Certificate + Goodies',
-  },
-  {
-    title: 'Third Place',
-    amount: '₹2,000',
-    icon: IconAward,
-    color: '#FF44AA',
-    textColor: '#FFFFFF',
-    description: 'Prize + Certificate + Exclusive merch',
+    description: 'Distributed among top performers + Certificates + Mentorship & Networking Opportunities',
   },
 ];
 
@@ -78,7 +90,7 @@ export default function PrizesPage() {
               <IconTrophy size={16} color="#001A6E" strokeWidth={3} />
               <span className="flex-1 font-black text-xs uppercase tracking-widest"
                 style={{ fontFamily: 'var(--y2k-font-mono)', color: '#001A6E' }}>
-                prizes.exe — ₹15,000 POOL
+                prizes.exe — ₹12,000 POOL
               </span>
             </div>
             <div className="px-6 py-6">
@@ -87,14 +99,14 @@ export default function PrizesPage() {
                 WIN BIG
               </h1>
               <p className="text-sm" style={{ color: '#64748B', fontFamily: 'var(--y2k-font-ui)' }}>
-                ₹15,000+ in cash prizes, certificates, and exclusive opportunities
+                ₹12,000 in combined prize pool distributed among winners with certificates and exclusive opportunities
               </p>
             </div>
           </div>
         </motion.div>
 
         {/* Main Prizes */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-10 md:max-w-xl md:mx-auto">
           {prizes.map((prize, idx) => {
             const Icon = prize.icon;
             return (
@@ -133,41 +145,7 @@ export default function PrizesPage() {
         </div>
 
         {/* Bonus Prizes */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ ...SPRING, delay: 0.4 }}>
-          <div style={{ border: '3px solid #001A6E', background: '#FFFFFF', boxShadow: '6px 6px 0px #001A6E' }}>
-            <div className="flex items-center gap-3 px-4 py-3"
-              style={{ background: '#0055FF', borderBottom: '3px solid #001A6E' }}>
-              <IconStar size={18} color="#CCFF00" strokeWidth={3} />
-              <span className="font-black text-sm uppercase text-white"
-                style={{ fontFamily: 'var(--y2k-font-ui)' }}>
-                Special Category Awards
-              </span>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {bonusPrizes.map((award, idx) => (
-                  <motion.div key={award}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + idx * 0.05 }}
-                    className="flex items-center gap-3 p-3"
-                    style={{ border: '2px solid #001A6E', background: '#F0FFF4' }}>
-                    <div className="w-6 h-6 flex items-center justify-center shrink-0"
-                      style={{ background: '#CCFF00', border: '2px solid #001A6E' }}>
-                      <IconStar size={14} color="#001A6E" strokeWidth={3} />
-                    </div>
-                    <span className="text-sm font-bold"
-                      style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-                      {award}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        
 
         {/* Additional Info */}
         <motion.div className="mt-8"
@@ -177,7 +155,7 @@ export default function PrizesPage() {
             style={{ border: '3px solid #001A6E', background: '#FFFFFF', boxShadow: '4px 4px 0px #001A6E' }}>
             <p className="text-sm font-bold mb-1"
               style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
-              🎁 All Participants Receive
+             All Participants Receive
             </p>
             <p className="text-xs"
               style={{ color: '#64748B', fontFamily: 'var(--y2k-font-ui)' }}>

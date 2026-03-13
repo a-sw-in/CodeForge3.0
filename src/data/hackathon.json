@@ -11,7 +11,7 @@
         "registrationDeadline": "2026-03-20T09:00:00",
         "hackathonStart": "2026-03-22T09:00:00",
         "email": "ieeesbucek@gmail.com",
-        "phone": "+91 88481 17086",
+        "phone": "+91 77361 71899",
         "social": {
             "instagram": "https://www.instagram.com/ieeesbucek?igsh=MW93MWMwd2hrYXFicA==",
             "github": "https://github.com/IEEE-SB-UCEK",
@@ -21,11 +21,11 @@
     },
     "stats": [
         {
-            "value": "200+",
+            "value": "80+",
             "label": "Participants"
         },
         {
-            "value": "₹15K",
+            "value": "₹12K",
             "label": "Prize Pool"
         },
         {
@@ -33,13 +33,13 @@
             "label": "Duration"
         },
         {
-            "value": "20+",
+            "value": "10+",
             "label": "Mentors"
         }
     ],
     "features": [
         {
-            "label": "₹15K+",
+            "label": "₹12K+",
             "sub": "Prize Pool"
         },
         {
@@ -133,6 +133,38 @@
         {
             "question": "Will there be breaks and refreshments during the hackathon?",
             "answer": "Yes. Participants will have scheduled breaks and interactive fun sessions to relax and recharge. Meals and snacks will be provided throughout the event to keep teams energized."
+        }
+    ],
+    "sponsors": [
+        {
+            "name": "Sponsor One",
+            "logo": "/sponsors/sponsor1.png",
+            "category": "Platinum Partner"
+        },
+        {
+            "name": "Sponsor Two",
+            "logo": "/sponsors/sponsor2.png",
+            "category": "Gold Partner"
+        },
+        {
+            "name": "Sponsor Three",
+            "logo": "/sponsors/sponsor3.png",
+            "category": "Silver Partner"
+        },
+        {
+            "name": "Sponsor Four",
+            "logo": "/sponsors/sponsor4.png",
+            "category": "Bronze Partner"
+        },
+        {
+            "name": "Sponsor Five",
+            "logo": "/sponsors/sponsor5.png",
+            "category": "Partner"
+        },
+        {
+            "name": "Sponsor Six",
+            "logo": "/sponsors/sponsor6.png",
+            "category": "Partner"
         }
     ],
     "pastEvents": [

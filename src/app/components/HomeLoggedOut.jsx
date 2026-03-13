@@ -7,6 +7,7 @@ import { IconArrowRight, IconTrophy, IconUsers, IconBolt, IconX } from '@tabler/
 import About from './about';
 import ScheduleTimeline from './ScheduleTimeline';
 import RulesAndFAQ from './RulesAndFAQ';
+import Sponsors from './Sponsors';
 import Footer from './Footer';
 import hackathon from '@/data/hackathon.json';
 
@@ -361,6 +362,7 @@ export default function HomeLoggedOut({ session, onDashboard }) {
       <div id="about-section"><About /></div>
       <div id="schedule-section"><ScheduleTimeline /></div>
       <div id="register-section"><RulesAndFAQ /></div>
+      {/*<div id="sponsors-section"><Sponsors /></div>*/}
       <Footer />
     </div>
   );
