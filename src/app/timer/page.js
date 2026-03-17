@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import SponsorsCarousel from '../components/SponsorsCarousel';
+import BreakCommercial from '../components/BreakCommercial';
 
 /* ─── Star Burst ─── */
 function StarBurst({ color = '#CCFF00', size = 140, style = {} }) {
@@ -117,6 +119,9 @@ export default function CountdownTimer() {
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-start pt-12 px-4 md:px-6" style={{ background: '#0055FF' }}>
+      {/* Break Commercial Overlay */}
+      <BreakCommercial isVisible={isPaused} />
+
       {/* Y2K Background decorations - Star Bursts */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 1 }}>
         <StarBurst size={120} color="#CCFF00" style={{ position: 'absolute', top: '8%', left: '5%', opacity: 0.8 }} />
@@ -153,50 +158,7 @@ export default function CountdownTimer() {
         </div>
 
         {/* Countdown Display */}
-        {isPaused ? (
-          <motion.div
-            className="text-center"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', duration: 0.8 }}
-          >
-            <div className="inline-block px-12 py-8"
-              style={{
-                background: '#FFD700',
-                border: '3px solid #001A6E',
-                boxShadow: '8px 8px 0px #001A6E',
-              }}>
-              <p className="text-3xl md:text-4xl font-bold uppercase mb-4"
-                style={{ fontFamily: 'var(--y2k-font-display)', color: '#001A6E', letterSpacing: '0.05em' }}>
-               BREAK TIME  ;) 
-              </p>
-              <div className="bg-white rounded-lg p-6 inline-block">
-                <div className="flex gap-4 items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-5xl font-bold" style={{ fontFamily: 'var(--y2k-font-display)', color: '#FF8C00' }}>
-                      {String(timeLeft.hours).padStart(2, '0')}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1 font-bold uppercase">HOURS</div>
-                  </div>
-                  <div className="text-4xl font-bold" style={{ color: '#FF8C00' }}>:</div>
-                  <div className="text-center">
-                    <div className="text-5xl font-bold" style={{ fontFamily: 'var(--y2k-font-display)', color: '#FF8C00' }}>
-                      {String(timeLeft.minutes).padStart(2, '0')}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1 font-bold uppercase">MINUTES</div>
-                  </div>
-                  <div className="text-4xl font-bold" style={{ color: '#FF8C00' }}>:</div>
-                  <div className="text-center">
-                    <div className="text-5xl font-bold" style={{ fontFamily: 'var(--y2k-font-display)', color: '#FF8C00' }}>
-                      {String(timeLeft.seconds).padStart(2, '0')}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-1 font-bold uppercase">SECONDS</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : !timerActive && !eventStarted ? (
+        {!timerActive && !eventStarted ? (
           <motion.div
             className="text-center mt-[10vh]"
             initial={{ scale: 0 }}
@@ -242,7 +204,7 @@ export default function CountdownTimer() {
           <div className="grid grid-cols-3 gap-4 md:gap-6">
             {/* Hours */}
             <motion.div
-              className="flex flex-col items-center"
+              className="flex mt-[5vh] flex-col items-center"
               style={{
                 background: '#FFFFFF',
                 border: '3px solid #001A6E',
@@ -266,7 +228,7 @@ export default function CountdownTimer() {
 
             {/* Minutes */}
             <motion.div
-              className="flex flex-col items-center"
+              className="flex mt-[5vh] flex-col items-center"
               style={{
                 background: '#FFFFFF',
                 border: '3px solid #001A6E',
@@ -290,7 +252,7 @@ export default function CountdownTimer() {
 
             {/* Seconds */}
             <motion.div
-              className="flex flex-col items-center"
+              className="flex mt-[5vh] flex-col items-center"
               style={{
                 background: '#CCFF00',
                 border: '3px solid #001A6E',
@@ -322,6 +284,9 @@ export default function CountdownTimer() {
           transition={{ delay: 0.6 }}
         >
         </motion.div>
+
+        {/* Sponsors Carousel */}
+        <SponsorsCarousel />
       </motion.div>
     </div>
   );
