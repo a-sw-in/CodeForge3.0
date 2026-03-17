@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconHash, IconUpload, IconX, IconPhone } from '@tabler/icons-react';
+import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconUpload, IconX, IconPhone } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import data from '@/data/hackathon.json';
 
@@ -21,11 +21,9 @@ export default function LoginPage() {
   const [yearOfStudy, setYearOfStudy] = useState('');
   const [isIEEEMember, setIsIEEEMember] = useState(false);
   const [ieeeId, setIeeeId] = useState('');
-  const [isUCEKStudent, setIsUCEKStudent] = useState(false);
-  const [admissionNumber, setAdmissionNumber] = useState('');
   const [additionalMembers, setAdditionalMembers] = useState([]);
   const [currentMemberIndex, setCurrentMemberIndex] = useState(0);
-  const [currentMemberData, setCurrentMemberData] = useState({ name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '', isUCEKStudent: false, admissionNumber: '' });
+  const [currentMemberData, setCurrentMemberData] = useState({ name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentScreenshots, setPaymentScreenshots] = useState([]);
@@ -45,19 +43,17 @@ export default function LoginPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Calculate total fee based on team size, IEEE membership, and UCEK status
+  // Calculate total fee based on IEEE membership
   const calculateTotalFee = () => {
     let total = 0;
     
     // Leader fee
-    let leaderBaseFee = isIEEEMember ? 399 : 499;
-    let leaderFee = isUCEKStudent ? leaderBaseFee - 100 : leaderBaseFee;
+    let leaderFee = isIEEEMember ? 299 : 399;
     total += leaderFee;
     
     // Additional members fees
     additionalMembers.forEach((member) => {
-      let baseFee = member.isIEEEMember ? 399 : 499;
-      let memberFee = member.isUCEKStudent ? baseFee - 100 : baseFee;
+      let memberFee = member.isIEEEMember ? 299 : 399;
       total += memberFee;
     });
     
@@ -66,28 +62,23 @@ export default function LoginPage() {
 
   // Get fee breakdown
   const getFeeBreakdown = () => {
-    const breakdown = [];
     const members = [];
     
     // Add leader
-    let leaderBaseFee = isIEEEMember ? 399 : 499;
-    let leaderFinalFee = isUCEKStudent ? leaderBaseFee - 100 : leaderBaseFee;
+    let leaderFee = isIEEEMember ? 299 : 399;
     members.push({
       name: name || 'Team Leader',
       isIEEE: isIEEEMember,
-      isUCEK: isUCEKStudent,
-      fee: leaderFinalFee
+      fee: leaderFee
     });
     
     // Add additional members
     additionalMembers.forEach((member, index) => {
-      let baseFee = member.isIEEEMember ? 399 : 499;
-      let finalFee = member.isUCEKStudent ? baseFee - 100 : baseFee;
+      let memberFee = member.isIEEEMember ? 299 : 399;
       members.push({
         name: member.name || `Member ${index + 2}`,
         isIEEE: member.isIEEEMember,
-        isUCEK: member.isUCEKStudent,
-        fee: finalFee
+        fee: memberFee
       });
     });
     
@@ -210,8 +201,6 @@ export default function LoginPage() {
     }
     // Store leader IEEE info
     localStorage.setItem('leaderIEEE', JSON.stringify({ isIEEEMember, ieeeId }));
-    // Store leader UCEK info
-    localStorage.setItem('leaderUCEK', JSON.stringify({ isUCEKStudent, admissionNumber }));
   };
 
   const handleAddTeamMember = (e) => {
@@ -325,8 +314,6 @@ export default function LoginPage() {
         leader_year: yearOfStudy,
         leader_ieee_member: isIEEEMember,
         leader_ieee_id: isIEEEMember ? ieeeId : null,
-        leader_is_ucek_student: isUCEKStudent,
-        leader_admission_number: isUCEKStudent ? admissionNumber : null,
         // Member 2
         member2_name: members[0]?.name || null,
         member2_email: members[0]?.email || null,
@@ -334,8 +321,6 @@ export default function LoginPage() {
         member2_year: members[0]?.yearOfStudy || null,
         member2_ieee_member: members[0]?.isIEEEMember || false,
         member2_ieee_id: members[0]?.isIEEEMember ? members[0]?.ieeeId : null,
-        member2_is_ucek_student: members[0]?.isUCEKStudent || false,
-        member2_admission_number: members[0]?.isUCEKStudent ? members[0]?.admissionNumber : null,
         // Member 3
         member3_name: members[1]?.name || null,
         member3_email: members[1]?.email || null,
@@ -343,8 +328,6 @@ export default function LoginPage() {
         member3_year: members[1]?.yearOfStudy || null,
         member3_ieee_member: members[1]?.isIEEEMember || false,
         member3_ieee_id: members[1]?.isIEEEMember ? members[1]?.ieeeId : null,
-        member3_is_ucek_student: members[1]?.isUCEKStudent || false,
-        member3_admission_number: members[1]?.isUCEKStudent ? members[1]?.admissionNumber : null,
         // Member 4
         member4_name: members[2]?.name || null,
         member4_email: members[2]?.email || null,
@@ -352,8 +335,6 @@ export default function LoginPage() {
         member4_year: members[2]?.yearOfStudy || null,
         member4_ieee_member: members[2]?.isIEEEMember || false,
         member4_ieee_id: members[2]?.isIEEEMember ? members[2]?.ieeeId : null,
-        member4_is_ucek_student: members[2]?.isUCEKStudent || false,
-        member4_admission_number: members[2]?.isUCEKStudent ? members[2]?.admissionNumber : null,
         approved: false,
         created_at: new Date().toISOString(),
       };
@@ -401,14 +382,14 @@ export default function LoginPage() {
       if (currentMemberIndex > 0) {
         // Go back to previous team member
         setCurrentMemberIndex(currentMemberIndex - 1);
-        const prevMemberData = additionalMembers[currentMemberIndex - 1] || { name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '', isUCEKStudent: false, admissionNumber: '' };
+        const prevMemberData = additionalMembers[currentMemberIndex - 1] || { name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '' };
         setCurrentMemberData(prevMemberData);
       } else {
         // Go back to register step
         setStep('register');
         setCurrentMemberIndex(0);
         setAdditionalMembers([]);
-        setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '', isUCEKStudent: false, admissionNumber: '' });
+        setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '' });
       }
     } else {
       setStep('email');
@@ -421,11 +402,9 @@ export default function LoginPage() {
       setYearOfStudy('');
       setIsIEEEMember(false);
       setIeeeId('');
-      setIsUCEKStudent(false);
-      setAdmissionNumber('');
       setAdditionalMembers([]);
       setCurrentMemberIndex(0);
-      setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '', isUCEKStudent: false, admissionNumber: '' });
+      setCurrentMemberData({ name: '', email: '', phone: '', yearOfStudy: '', isIEEEMember: false, ieeeId: '' });
       setPaymentScreenshots([]);
     }
   };
@@ -1020,56 +999,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <div className="mb-3">
-                <label className="flex items-center text-xs font-bold uppercase mb-2" 
-                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
-                  <input
-                    type="checkbox"
-                    checked={isUCEKStudent}
-                    onChange={(e) => setIsUCEKStudent(e.target.checked)}
-                    className="w-4 h-4 mr-2"
-                    style={{
-                      cursor: 'pointer',
-                      accentColor: '#0055FF',
-                    }}
-                    disabled={loading}
-                  />
-                  UCEK Student
-                </label>
-              </div>
-
-              {isUCEKStudent && (
-                <div className="mb-5">
-                  <label className="block text-xs font-bold uppercase mb-1.5" 
-                    style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
-                    Admission Number
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
-                      <IconHash className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="text"
-                      value={admissionNumber}
-                      onChange={(e) => setAdmissionNumber(e.target.value)}
-                      required={isUCEKStudent}
-                      className="w-full pl-10 pr-3 py-2 text-xs font-medium"
-                      style={{
-                        fontFamily: 'var(--y2k-font-ui)',
-                        background: '#FFFFFF',
-                        color: '#001A6E',
-                        border: '3px solid #00AA00',
-                        outline: 'none',
-                      }}
-                      placeholder="Enter admission number"
-                      disabled={loading}
-                      onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
-                      onBlur={(e) => e.target.style.boxShadow = 'none'}
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className="flex gap-2">
                 <motion.button
                   type="button"
@@ -1316,56 +1245,6 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <div className="mb-3">
-                <label className="flex items-center text-xs font-bold uppercase mb-2" 
-                  style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
-                  <input
-                    type="checkbox"
-                    checked={currentMemberData.isUCEKStudent}
-                    onChange={(e) => setCurrentMemberData({ ...currentMemberData, isUCEKStudent: e.target.checked })}
-                    className="w-4 h-4 mr-2"
-                    style={{
-                      cursor: 'pointer',
-                      accentColor: '#0055FF',
-                    }}
-                    disabled={loading}
-                  />
-                  UCEK Student
-                </label>
-              </div>
-
-              {currentMemberData.isUCEKStudent && (
-                <div className="mb-5">
-                  <label className="block text-xs font-bold uppercase mb-1.5" 
-                    style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.05em' }}>
-                    Admission Number
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#001A6E' }}>
-                      <IconHash className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="text"
-                      value={currentMemberData.admissionNumber}
-                      onChange={(e) => setCurrentMemberData({ ...currentMemberData, admissionNumber: e.target.value })}
-                      required={currentMemberData.isUCEKStudent}
-                      className="w-full pl-10 pr-3 py-2 text-xs font-medium"
-                      style={{
-                        fontFamily: 'var(--y2k-font-ui)',
-                        background: '#FFFFFF',
-                        color: '#001A6E',
-                        border: '3px solid #00AA00',
-                        outline: 'none',
-                      }}
-                      placeholder="Enter admission number"
-                      disabled={loading}
-                      onFocus={(e) => e.target.style.boxShadow = '3px 3px 0px #CCFF00'}
-                      onBlur={(e) => e.target.style.boxShadow = 'none'}
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className="flex gap-2">
                 <motion.button
                   type="button"
@@ -1515,11 +1394,11 @@ export default function LoginPage() {
                   {getFeeBreakdown().map((member, index) => (
                     <div key={index} className="flex justify-between text-xs px-2 py-1 rounded"
                       style={{
-                        background: member.isUCEK ? '#E8F5E9' : (member.isIEEE ? '#E0F2FE' : '#FEF3C7'),
+                        background: member.isIEEE ? '#E0F2FE' : '#FEF3C7',
                         fontFamily: 'var(--y2k-font-ui)',
                         color: '#001A6E'
                       }}>
-                      <span>{member.name} {member.isIEEE ? '(IEEE)' : ''} {member.isUCEK ? '(UCEK -₹100)' : ''}</span>
+                      <span>{member.name} {member.isIEEE ? '(IEEE)' : ''}</span>
                       <span className="font-bold">₹{member.fee}</span>
                     </div>
                   ))}
