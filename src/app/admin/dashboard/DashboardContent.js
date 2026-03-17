@@ -556,64 +556,60 @@ export default function AdminDashboard({ inTabView = false }) {
                     <div className="space-y-1 mb-3">
                       {/* Leader */}
                       {(() => {
-                        const leaderBaseFee = editedTeam?.leader_ieee_member ? 399 : 499;
-                        const leaderFee = editedTeam?.leader_is_ucek_student ? leaderBaseFee - 100 : leaderBaseFee;
+                        const leaderFee = editedTeam?.leader_ieee_member ? 299 : 399;
                         return (
                           <div className="flex justify-between text-xs px-2 py-1 rounded"
                             style={{
-                              background: editedTeam?.leader_is_ucek_student ? '#E8F5E9' : (editedTeam?.leader_ieee_member ? '#E0F2FE' : '#FEF3C7'),
+                              background: editedTeam?.leader_ieee_member ? '#E0F2FE' : '#FEF3C7',
                               fontFamily: 'var(--y2k-font-ui)',
                               color: '#001A6E'
                             }}>
-                            <span>{editedTeam?.leader_name || 'Leader'} {editedTeam?.leader_ieee_member ? '(IEEE)' : ''} {editedTeam?.leader_is_ucek_student ? '(UCEK -₹100)' : ''}</span>
+                            <span>{editedTeam?.leader_name || 'Leader'} {editedTeam?.leader_ieee_member ? '(IEEE)' : ''}</span>
                             <span className="font-bold">₹{leaderFee}</span>
                           </div>
                         );
                       })()}
                       {/* Member 2 */}
                       {(editedTeam?.total_members >= 2 || editedTeam?.member2_name) && (() => {
-                        const member2BaseFee = editedTeam?.member2_ieee_member ? 399 : 499;
-                        const member2Fee = editedTeam?.member2_is_ucek_student ? member2BaseFee - 100 : member2BaseFee;
+                        const member2Fee = editedTeam?.member2_ieee_member ? 299 : 399;
                         return (
                           <div className="flex justify-between text-xs px-2 py-1 rounded"
                             style={{
-                              background: editedTeam?.member2_is_ucek_student ? '#E8F5E9' : (editedTeam?.member2_ieee_member ? '#E0F2FE' : '#FEF3C7'),
+                              background: editedTeam?.member2_ieee_member ? '#E0F2FE' : '#FEF3C7',
                               fontFamily: 'var(--y2k-font-ui)',
                               color: '#001A6E'
                             }}>
-                            <span>{editedTeam?.member2_name || 'Member 2'} {editedTeam?.member2_ieee_member ? '(IEEE)' : ''} {editedTeam?.member2_is_ucek_student ? '(UCEK -₹100)' : ''}</span>
+                            <span>{editedTeam?.member2_name || 'Member 2'} {editedTeam?.member2_ieee_member ? '(IEEE)' : ''}</span>
                             <span className="font-bold">₹{member2Fee}</span>
                           </div>
                         );
                       })()}
                       {/* Member 3 */}
                       {(editedTeam?.total_members >= 3 || editedTeam?.member3_name) && (() => {
-                        const member3BaseFee = editedTeam?.member3_ieee_member ? 399 : 499;
-                        const member3Fee = editedTeam?.member3_is_ucek_student ? member3BaseFee - 100 : member3BaseFee;
+                        const member3Fee = editedTeam?.member3_ieee_member ? 299 : 399;
                         return (
                           <div className="flex justify-between text-xs px-2 py-1 rounded"
                             style={{
-                              background: editedTeam?.member3_is_ucek_student ? '#E8F5E9' : (editedTeam?.member3_ieee_member ? '#E0F2FE' : '#FEF3C7'),
+                              background: editedTeam?.member3_ieee_member ? '#E0F2FE' : '#FEF3C7',
                               fontFamily: 'var(--y2k-font-ui)',
                               color: '#001A6E'
                             }}>
-                            <span>{editedTeam?.member3_name || 'Member 3'} {editedTeam?.member3_ieee_member ? '(IEEE)' : ''} {editedTeam?.member3_is_ucek_student ? '(UCEK -₹100)' : ''}</span>
+                            <span>{editedTeam?.member3_name || 'Member 3'} {editedTeam?.member3_ieee_member ? '(IEEE)' : ''}</span>
                             <span className="font-bold">₹{member3Fee}</span>
                           </div>
                         );
                       })()}
                       {/* Member 4 */}
                       {(editedTeam?.total_members >= 4 || editedTeam?.member4_name) && (() => {
-                        const member4BaseFee = editedTeam?.member4_ieee_member ? 399 : 499;
-                        const member4Fee = editedTeam?.member4_is_ucek_student ? member4BaseFee - 100 : member4BaseFee;
+                        const member4Fee = editedTeam?.member4_ieee_member ? 299 : 399;
                         return (
                           <div className="flex justify-between text-xs px-2 py-1 rounded"
                             style={{
-                              background: editedTeam?.member4_is_ucek_student ? '#E8F5E9' : (editedTeam?.member4_ieee_member ? '#E0F2FE' : '#FEF3C7'),
+                              background: editedTeam?.member4_ieee_member ? '#E0F2FE' : '#FEF3C7',
                               fontFamily: 'var(--y2k-font-ui)',
                               color: '#001A6E'
                             }}>
-                            <span>{editedTeam?.member4_name || 'Member 4'} {editedTeam?.member4_ieee_member ? '(IEEE)' : ''} {editedTeam?.member4_is_ucek_student ? '(UCEK -₹100)' : ''}</span>
+                            <span>{editedTeam?.member4_name || 'Member 4'} {editedTeam?.member4_ieee_member ? '(IEEE)' : ''}</span>
                             <span className="font-bold">₹{member4Fee}</span>
                           </div>
                         );
@@ -629,17 +625,13 @@ export default function AdminDashboard({ inTabView = false }) {
                         <span>
                           ₹{
                             (() => {
-                              const leaderBase = editedTeam?.leader_ieee_member ? 399 : 499;
-                              const leaderFinal = editedTeam?.leader_is_ucek_student ? leaderBase - 100 : leaderBase;
+                              const leaderFinal = editedTeam?.leader_ieee_member ? 299 : 399;
                               
-                              const member2Base = editedTeam?.member2_ieee_member ? 399 : 499;
-                              const member2Final = editedTeam?.member2_is_ucek_student ? member2Base - 100 : member2Base;
+                              const member2Final = editedTeam?.member2_ieee_member ? 299 : 399;
                               
-                              const member3Base = editedTeam?.member3_ieee_member ? 399 : 499;
-                              const member3Final = editedTeam?.member3_is_ucek_student ? member3Base - 100 : member3Base;
+                              const member3Final = editedTeam?.member3_ieee_member ? 299 : 399;
                               
-                              const member4Base = editedTeam?.member4_ieee_member ? 399 : 499;
-                              const member4Final = editedTeam?.member4_is_ucek_student ? member4Base - 100 : member4Base;
+                              const member4Final = editedTeam?.member4_ieee_member ? 299 : 399;
                               
                               return (
                                 leaderFinal +
@@ -874,64 +866,7 @@ export default function AdminDashboard({ inTabView = false }) {
                           />
                         </div>
                       )}
-                      <div>
-                        <label className="block text-xs font-bold uppercase mb-2" 
-                          style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
-                          UCEK Student
-                        </label>
-                        <div className="flex items-center gap-3 p-3"
-                          style={{
-                            background: '#F8FAFC',
-                            border: '3px solid #E2E8F0',
-                          }}>
-                          <input
-                            id="leader-ucek-checkbox"
-                            type="checkbox"
-                            checked={Boolean(editedTeam?.leader_is_ucek_student)}
-                            onChange={(e) => handleFieldChange('leader_is_ucek_student', e.target.checked)}
-                            disabled={!isEditing}
-                            className="w-5 h-5"
-                            style={{
-                              accentColor: '#00AA00',
-                              cursor: isEditing ? 'pointer' : 'not-allowed'
-                            }}
-                          />
-                          <label
-                            htmlFor="leader-ucek-checkbox"
-                            className="text-sm font-bold uppercase"
-                            style={{
-                              fontFamily: 'var(--y2k-font-ui)',
-                              color: Boolean(editedTeam?.leader_is_ucek_student) ? '#00AA00' : '#64748B',
-                              letterSpacing: '0.06em',
-                              cursor: isEditing ? 'pointer' : 'default',
-                            }}
-                          >
-                            {Boolean(editedTeam?.leader_is_ucek_student) ? '✓ YES' : '✗ NO'}
-                          </label>
-                        </div>
-                      </div>
-                      {editedTeam?.leader_is_ucek_student && (
-                        <div>
-                          <label className="block text-xs font-bold uppercase mb-2" 
-                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#00AA00', letterSpacing: '0.1em' }}>
-                            Admission Number
-                          </label>
-                          <input
-                            type="text"
-                            value={editedTeam?.leader_admission_number || ''}
-                            onChange={(e) => handleFieldChange('leader_admission_number', e.target.value)}
-                            disabled={!isEditing}
-                            className="w-full px-4 py-2 text-sm font-medium"
-                            style={{
-                              fontFamily: 'var(--y2k-font-ui)',
-                              background: isEditing ? '#FFFFFF' : '#F1F5F9',
-                              color: '#00AA00',
-                              border: '3px solid #00AA00',
-                              outline: 'none',
-                            }}
-                          />
-                        </div>
-                      )}
+
                     </div>
                   </div>
 
@@ -1081,64 +1016,7 @@ export default function AdminDashboard({ inTabView = false }) {
                             />
                           </div>
                         )}
-                        <div>
-                          <label className="block text-xs font-bold uppercase mb-2" 
-                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
-                            UCEK Student
-                          </label>
-                          <div className="flex items-center gap-3 p-3"
-                            style={{
-                              background: '#F8FAFC',
-                              border: '3px solid #E2E8F0',
-                            }}>
-                            <input
-                              id="member2-ucek-checkbox"
-                              type="checkbox"
-                              checked={Boolean(editedTeam?.member2_is_ucek_student)}
-                              onChange={(e) => handleFieldChange('member2_is_ucek_student', e.target.checked)}
-                              disabled={!isEditing}
-                              className="w-5 h-5"
-                              style={{
-                                accentColor: '#00AA00',
-                                cursor: isEditing ? 'pointer' : 'not-allowed'
-                              }}
-                            />
-                            <label
-                              htmlFor="member2-ucek-checkbox"
-                              className="text-sm font-bold uppercase"
-                              style={{
-                                fontFamily: 'var(--y2k-font-ui)',
-                                color: Boolean(editedTeam?.member2_is_ucek_student) ? '#00AA00' : '#64748B',
-                                letterSpacing: '0.06em',
-                                cursor: isEditing ? 'pointer' : 'default',
-                              }}
-                            >
-                              {Boolean(editedTeam?.member2_is_ucek_student) ? '✓ YES' : '✗ NO'}
-                            </label>
-                          </div>
-                        </div>
-                        {editedTeam?.member2_is_ucek_student && (
-                          <div>
-                            <label className="block text-xs font-bold uppercase mb-2" 
-                              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#00AA00', letterSpacing: '0.1em' }}>
-                              Admission Number
-                            </label>
-                            <input
-                              type="text"
-                              value={editedTeam?.member2_admission_number || ''}
-                              onChange={(e) => handleFieldChange('member2_admission_number', e.target.value)}
-                              disabled={!isEditing}
-                              className="w-full px-4 py-2 text-sm font-medium"
-                              style={{
-                                fontFamily: 'var(--y2k-font-ui)',
-                                background: isEditing ? '#FFFFFF' : '#F1F5F9',
-                                color: '#00AA00',
-                                border: '3px solid #00AA00',
-                                outline: 'none',
-                              }}
-                            />
-                          </div>
-                        )}
+
                       </div>
                     </div>
                   )}
@@ -1289,64 +1167,7 @@ export default function AdminDashboard({ inTabView = false }) {
                             />
                           </div>
                         )}
-                        <div>
-                          <label className="block text-xs font-bold uppercase mb-2" 
-                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
-                            UCEK Student
-                          </label>
-                          <div className="flex items-center gap-3 p-3"
-                            style={{
-                              background: '#F8FAFC',
-                              border: '3px solid #E2E8F0',
-                            }}>
-                            <input
-                              id="member3-ucek-checkbox"
-                              type="checkbox"
-                              checked={Boolean(editedTeam?.member3_is_ucek_student)}
-                              onChange={(e) => handleFieldChange('member3_is_ucek_student', e.target.checked)}
-                              disabled={!isEditing}
-                              className="w-5 h-5"
-                              style={{
-                                accentColor: '#00AA00',
-                                cursor: isEditing ? 'pointer' : 'not-allowed'
-                              }}
-                            />
-                            <label
-                              htmlFor="member3-ucek-checkbox"
-                              className="text-sm font-bold uppercase"
-                              style={{
-                                fontFamily: 'var(--y2k-font-ui)',
-                                color: Boolean(editedTeam?.member3_is_ucek_student) ? '#00AA00' : '#64748B',
-                                letterSpacing: '0.06em',
-                                cursor: isEditing ? 'pointer' : 'default',
-                              }}
-                            >
-                              {Boolean(editedTeam?.member3_is_ucek_student) ? '✓ YES' : '✗ NO'}
-                            </label>
-                          </div>
-                        </div>
-                        {editedTeam?.member3_is_ucek_student && (
-                          <div>
-                            <label className="block text-xs font-bold uppercase mb-2" 
-                              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#00AA00', letterSpacing: '0.1em' }}>
-                              Admission Number
-                            </label>
-                            <input
-                              type="text"
-                              value={editedTeam?.member3_admission_number || ''}
-                              onChange={(e) => handleFieldChange('member3_admission_number', e.target.value)}
-                              disabled={!isEditing}
-                              className="w-full px-4 py-2 text-sm font-medium"
-                              style={{
-                                fontFamily: 'var(--y2k-font-ui)',
-                                background: isEditing ? '#FFFFFF' : '#F1F5F9',
-                                color: '#00AA00',
-                                border: '3px solid #00AA00',
-                                outline: 'none',
-                              }}
-                            />
-                          </div>
-                        )}
+
                       </div>
                     </div>
                   )}
@@ -1497,64 +1318,7 @@ export default function AdminDashboard({ inTabView = false }) {
                             />
                           </div>
                         )}
-                        <div>
-                          <label className="block text-xs font-bold uppercase mb-2" 
-                            style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
-                            UCEK Student
-                          </label>
-                          <div className="flex items-center gap-3 p-3"
-                            style={{
-                              background: '#F8FAFC',
-                              border: '3px solid #E2E8F0',
-                            }}>
-                            <input
-                              id="member4-ucek-checkbox"
-                              type="checkbox"
-                              checked={Boolean(editedTeam?.member4_is_ucek_student)}
-                              onChange={(e) => handleFieldChange('member4_is_ucek_student', e.target.checked)}
-                              disabled={!isEditing}
-                              className="w-5 h-5"
-                              style={{
-                                accentColor: '#00AA00',
-                                cursor: isEditing ? 'pointer' : 'not-allowed'
-                              }}
-                            />
-                            <label
-                              htmlFor="member4-ucek-checkbox"
-                              className="text-sm font-bold uppercase"
-                              style={{
-                                fontFamily: 'var(--y2k-font-ui)',
-                                color: Boolean(editedTeam?.member4_is_ucek_student) ? '#00AA00' : '#64748B',
-                                letterSpacing: '0.06em',
-                                cursor: isEditing ? 'pointer' : 'default',
-                              }}
-                            >
-                              {Boolean(editedTeam?.member4_is_ucek_student) ? '✓ YES' : '✗ NO'}
-                            </label>
-                          </div>
-                        </div>
-                        {editedTeam?.member4_is_ucek_student && (
-                          <div>
-                            <label className="block text-xs font-bold uppercase mb-2" 
-                              style={{ fontFamily: 'var(--y2k-font-ui)', color: '#00AA00', letterSpacing: '0.1em' }}>
-                              Admission Number
-                            </label>
-                            <input
-                              type="text"
-                              value={editedTeam?.member4_admission_number || ''}
-                              onChange={(e) => handleFieldChange('member4_admission_number', e.target.value)}
-                              disabled={!isEditing}
-                              className="w-full px-4 py-2 text-sm font-medium"
-                              style={{
-                                fontFamily: 'var(--y2k-font-ui)',
-                                background: isEditing ? '#FFFFFF' : '#F1F5F9',
-                                color: '#00AA00',
-                                border: '3px solid #00AA00',
-                                outline: 'none',
-                              }}
-                            />
-                          </div>
-                        )}
+
                       </div>
                     </div>
                   )}
