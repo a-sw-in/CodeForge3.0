@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconUpload, IconX, IconPhone } from '@tabler/icons-react';
+import { IconMail, IconLock, IconUser, IconArrowRight, IconArrowLeft, IconAlertCircle, IconUsers, IconSchool, IconUpload, IconX, IconPhone, IconHash } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import data from '@/data/hackathon.json';
 

@@ -97,7 +97,7 @@
   };
   
   // Prevent eval in production
-  if (process.env.NODE_ENV === 'production') {
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
     window.eval = function() {
       console.error('%c🚫 eval() is disabled for security', 'color: red; font-size: 16px; font-weight: bold;');
       throw new Error('eval() is disabled for security reasons');
