@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Outfit, Plus_Jakarta_Sans, Press_Start_2P } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import LoadingWrapper from "../ui/LoadingWrapper";
 import FloatingDockDemo from "../ui/floating-demo";
-import NotificationBell from "../app/components/NotificationBell";
 import { usePathname } from "next/navigation";
 
 const outfit = Outfit({
@@ -31,12 +30,10 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const isTimerRoute = pathname === '/timer';
-  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Set page title and hydration status
+  // Set page title
   useEffect(() => {
     document.title = 'CodeForge 3.0';
-    setIsHydrated(true);
   }, []);
 
   return (
@@ -52,12 +49,7 @@ export default function RootLayout({ children }) {
         className={`${pressStart2P.variable} ${outfit.variable} ${plusJakarta.variable} antialiased`}
         style={{ background: '#FFFDF5' }}
       >
-        {!isAdminRoute && !isTimerRoute && (
-          <>
-            <FloatingDockDemo />
-            {isHydrated && <NotificationBell />}
-          </>
-        )}
+        {!isAdminRoute && !isTimerRoute && <FloatingDockDemo />}
         <LoadingWrapper>
           {children}
         </LoadingWrapper>
