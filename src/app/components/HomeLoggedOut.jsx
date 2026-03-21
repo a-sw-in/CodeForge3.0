@@ -9,7 +9,6 @@ import ScheduleTimeline from './ScheduleTimeline';
 import RulesAndFAQ from './RulesAndFAQ';
 import Sponsors from './Sponsors';
 import Footer from './Footer';
-import NotificationBell from './NotificationBell';
 import hackathon from '@/data/hackathon.json';
 
 const { event, stats: statsData } = hackathon;
@@ -179,10 +178,8 @@ export default function HomeLoggedOut({ session, onDashboard }) {
 
       {/* ═══════════ HERO ═══════════ */}
       <section className="relative min-h-screen flex flex-col overflow-hidden" style={{ paddingTop: '80px' }}>
-        {/* Notification Bell - Fixed Position */}
-        <div className="fixed top-6 right-6 z-50">
-          <NotificationBell />
-        </div>
+        {/* Notification Bell - Fixed Position Left of Login */}
+        <NotificationBell />
 
         <Watermark />
 

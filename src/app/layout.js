@@ -6,6 +6,7 @@ import Script from "next/script";
 import "./globals.css";
 import LoadingWrapper from "../ui/LoadingWrapper";
 import FloatingDockDemo from "../ui/floating-demo";
+import NotificationBell from "../app/components/NotificationBell";
 import { usePathname } from "next/navigation";
 
 const outfit = Outfit({
@@ -49,7 +50,12 @@ export default function RootLayout({ children }) {
         className={`${pressStart2P.variable} ${outfit.variable} ${plusJakarta.variable} antialiased`}
         style={{ background: '#FFFDF5' }}
       >
-        {!isAdminRoute && !isTimerRoute && <FloatingDockDemo />}
+        {!isAdminRoute && !isTimerRoute && (
+          <>
+            <FloatingDockDemo />
+            <NotificationBell />
+          </>
+        )}
         <LoadingWrapper>
           {children}
         </LoadingWrapper>
