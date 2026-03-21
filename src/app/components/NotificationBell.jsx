@@ -10,8 +10,13 @@ export default function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Fetch announcements
+  // Fetch announcements (dev server only)
   useEffect(() => {
+    // Only fetch in development mode
+    if (process.env.NODE_ENV !== 'development') {
+      return;
+    }
+
     const fetchAnnouncements = async () => {
       try {
         setLoading(true);

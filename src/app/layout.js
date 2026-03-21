@@ -31,6 +31,7 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const isTimerRoute = pathname === '/timer';
+  const isDev = process.env.NODE_ENV === 'development';
 
   // Set page title
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function RootLayout({ children }) {
         {!isAdminRoute && !isTimerRoute && (
           <>
             <FloatingDockDemo />
-            <NotificationBell />
+            {isDev && <NotificationBell />}
           </>
         )}
         <LoadingWrapper>
