@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Outfit, Plus_Jakarta_Sans, Press_Start_2P } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -31,11 +31,12 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
   const isTimerRoute = pathname === '/timer';
-  const isDev = process.env.NODE_ENV === 'development';
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Set page title
+  // Set page title and hydration status
   useEffect(() => {
     document.title = 'CodeForge 3.0';
+    setIsHydrated(true);
   }, []);
 
   return (
@@ -54,7 +55,7 @@ export default function RootLayout({ children }) {
         {!isAdminRoute && !isTimerRoute && (
           <>
             <FloatingDockDemo />
-            {isDev && <NotificationBell />}
+            {isHydrated && <NotificationBell />}
           </>
         )}
         <LoadingWrapper>

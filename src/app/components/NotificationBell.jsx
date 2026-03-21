@@ -8,14 +8,16 @@ import { IconBell } from '@tabler/icons-react';
 export default function NotificationBell() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
-  // Fetch announcements (dev server only)
+  // Fetch announcements (client-side only)
   useEffect(() => {
-    // Only fetch in development mode
-    if (process.env.NODE_ENV !== 'development') {
-      return;
-    }
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
 
     const fetchAnnouncements = async () => {
       try {
@@ -27,6 +29,7 @@ export default function NotificationBell() {
         }
       } catch (error) {
         console.error('Error fetching announcements:', error);
+        setAnnouncements([]);
       } finally {
         setLoading(false);
       }
@@ -37,7 +40,7 @@ export default function NotificationBell() {
     // Optional: Refresh announcements every 30 seconds
     const interval = setInterval(fetchAnnouncements, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isClient]);
 
   const hasAnnouncements = announcements.length > 0;
 
