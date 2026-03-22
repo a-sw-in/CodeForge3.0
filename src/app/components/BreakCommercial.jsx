@@ -25,7 +25,7 @@ const commercialTaglines = [
   {
     mainText: "STAY ENERGIZED",
     subText: "ENERGY BOOST",
-    emoji: "⚡",
+    emoji: "",
   }
 ];
 
