@@ -14,18 +14,18 @@ const WebGLBreakAnimation = dynamic(
 const commercialTaglines = [
   {
     mainText: "TAKE A BREAK",
-    subText: "TAKE A KITKAT",
+    subText: "FEEL THE ELEGANCE",
     emoji: "🍫",
   },
   {
     mainText: "REFRESH YOURSELF",
-    subText: "COCA-COLA",
+    subText: "WHO DOES'NT LOVE CUTLET?",
     emoji: "🥤",
   },
   {
     mainText: "STAY ENERGIZED",
-    subText: "ENERGY BOOST",
-    emoji: "⚡",
+    subText: "ENERGY DRIVE",
+    emoji: "",
   }
 ];
 
