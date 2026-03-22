@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/adminAuthServer';
 import { getTimerState, startTimer, pauseTimer, resumeTimer, stopTimer, resetTimer, addTime, subtractTime } from '@/lib/timerState';
+import { broadcastTimerState } from '@/app/api/timer/events/route';
 
 // GET - Fetch timer status
 export async function GET() {
@@ -136,6 +137,9 @@ export async function POST(request) {
           { status: 400 }
         );
     }
+
+    // Broadcast state change to all SSE clients
+    broadcastTimerState();
 
     return NextResponse.json({
       success: true,

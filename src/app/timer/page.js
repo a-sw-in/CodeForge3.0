@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import SponsorsCarousel from '../components/SponsorsCarousel';
 import BreakCommercial from '../components/BreakCommercial';
 
@@ -27,8 +27,14 @@ export default function CountdownTimer() {
   const [isPaused, setIsPaused] = useState(false);
   const [loading, setLoading] = useState(true);
   const [serverOffset, setServerOffset] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [videoLink, setVideoLink] = useState('/videos/demo.mkv'); // Set your default video link here
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [videos, setVideos] = useState([]);
+  const videoRef = useRef(null);
 
-  // Fetch server time and calculate offset
+  // Fetch server time and calculate offset - ONLY ON PAGE LOAD
   useEffect(() => {
     const syncWithServer = async () => {
       try {
@@ -36,11 +42,14 @@ export default function CountdownTimer() {
         const data = await response.json();
         
         if (data.success) {
-          const serverTime = new Date(data.serverTime).getTime();
-          const clientTime = Date.now();
-          const offset = serverTime - clientTime;
+          const remaining = data.timeRemaining;
           
-          setServerOffset(offset);
+          const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+
+          setTimeLeft({ days, hours, minutes, seconds });
           setEventStarted(data.eventStarted || data.hasEnded);
           setTimerActive(data.timerActive);
           setIsPaused(data.isPaused);
@@ -53,55 +62,154 @@ export default function CountdownTimer() {
     };
 
     syncWithServer();
-    // Re-sync every 5 minutes to maintain accuracy
-    const syncInterval = setInterval(syncWithServer, 5 * 60 * 1000);
-
-    return () => clearInterval(syncInterval);
+    // Only runs once on mount
   }, []);
 
-  // Update countdown every second
+  // Connect to SSE stream for real-time timer updates
   useEffect(() => {
-    const updateCountdown = async () => {
-      try {
-        const response = await fetch('/api/timer');
-        const data = await response.json();
-        
-        if (data.success) {
-          setIsPaused(data.isPaused);
-          setTimerActive(data.timerActive);
-          
-          if (data.eventStarted || data.hasEnded) {
-            setEventStarted(true);
-            return;
-          }
+    if (loading) return;
 
-          // Check if timer hasn't started yet
-          if (!data.timerActive) {
-            setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-            return;
-          }
+    let eventSource = null;
+    let fallbackPollInterval = null;
+    let sseConnected = false;
 
-          const remaining = data.timeRemaining;
-          
-          const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+    const connectSSE = () => {
+      console.log('[Timer] Attempting SSE connection...');
+      eventSource = new EventSource('/api/timer/events');
 
-          setTimeLeft({ days, hours, minutes, seconds });
+      eventSource.onopen = () => {
+        sseConnected = true;
+        console.log('✅ SSE Connection established!');
+        // Stop fallback polling when SSE connects
+        if (fallbackPollInterval) {
+          clearInterval(fallbackPollInterval);
+          fallbackPollInterval = null;
         }
-      } catch (error) {
-        console.error('Failed to update countdown:', error);
-      }
+      };
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          const { timerState } = data;
+
+          if (timerState) {
+            setTimerActive(timerState.isActive);
+            setIsPaused(timerState.isPaused);
+
+            // If timer just was paused/resumed/reset, update the time
+            if (timerState.startTime) {
+              const now = Date.now();
+              const startTime = new Date(timerState.startTime).getTime();
+              const endTime = startTime + (24 * 60 * 60 * 1000) + (timerState.accumulatedPauseTime || 0);
+
+              let timeRemaining;
+              if (timerState.isPaused) {
+                timeRemaining = timerState.pausedTimeRemaining || 0;
+              } else {
+                timeRemaining = endTime - now;
+              }
+
+              const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+              const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+              const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+              const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+              setTimeLeft({ days, hours, minutes, seconds });
+              
+              if (timeRemaining <= 0) {
+                setEventStarted(true);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('SSE parsing error:', error);
+        }
+      };
+
+      eventSource.onerror = (error) => {
+        sseConnected = false;
+        console.error('❌ SSE connection error, using fallback polling');
+        eventSource.close();
+        
+        // Start fallback polling if SSE fails
+        if (!fallbackPollInterval) {
+          console.log('[Timer] Starting fallback polling...');
+          fallbackPollInterval = setInterval(() => {
+            fetch('/api/timer')
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  setTimerActive(data.timerActive);
+                  setIsPaused(data.isPaused);
+                  
+                  const remaining = data.timeRemaining;
+                  const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+                  const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                  const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                  setTimeLeft({ days, hours, minutes, seconds });
+                }
+              })
+              .catch(err => console.error('Fallback poll error:', err));
+          }, 5000); // Poll every 5 seconds as fallback
+        }
+      };
     };
 
-    if (!loading) {
-      updateCountdown();
-      // Update every second, the server will handle pause state
-      const interval = setInterval(updateCountdown, 1000);
-      return () => clearInterval(interval);
-    }
+    connectSSE();
+
+    return () => {
+      if (eventSource) {
+        console.log('Closing SSE connection');
+        eventSource.close();
+      }
+      if (fallbackPollInterval) {
+        console.log('Stopping fallback polling');
+        clearInterval(fallbackPollInterval);
+      }
+    };
   }, [loading]);
+
+  // Client-side countdown between SSE updates
+  useEffect(() => {
+    if (!timerActive || isPaused) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        let { days, hours, minutes, seconds } = prev;
+        
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours--;
+          minutes = 59;
+          seconds = 59;
+        } else if (days > 0) {
+          days--;
+          hours = 23;
+          minutes = 59;
+          seconds = 59;
+        } else {
+          setEventStarted(true);
+        }
+
+        return { days, hours, minutes, seconds };
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerActive, isPaused]);
+
+  // Ensure video has audio and volume is set
+  useEffect(() => {
+    if (videoRef.current && isPlayingVideo) {
+      videoRef.current.muted = false;
+      videoRef.current.volume = 1;
+    }
+  }, [isPlayingVideo]);
 
   if (loading) {
     return (
@@ -117,8 +225,158 @@ export default function CountdownTimer() {
     );
   }
 
+  const handlePlayVideo = () => {
+    setIsPlayingVideo(!isPlayingVideo);
+    if (!isPlayingVideo) {
+      // Fetch videos from JSON
+      fetch('/data/videos.json')
+        .then(res => res.json())
+        .then(data => {
+          setVideos(data.videos);
+          setCurrentVideoIndex(0);
+          setVideoLink(data.videos[0].path);
+        })
+        .catch(err => console.error('Failed to load videos:', err));
+    }
+  };
+
+  const handleCloseVideo = () => {
+    setIsPlayingVideo(false);
+  };
+
+  const handleVideoDoubleClick = (e) => {
+    if (!videoRef.current) return;
+    
+    const rect = videoRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const videoWidth = rect.width;
+    const isRightSide = clickX > videoWidth / 2;
+    
+    const skipAmount = 10; // seconds
+    const newTime = isRightSide 
+      ? videoRef.current.currentTime + skipAmount 
+      : videoRef.current.currentTime - skipAmount;
+    
+    videoRef.current.currentTime = Math.max(0, newTime);
+  };
+
+  // Handle video end - play next video from playlist
+  const handleVideoEnd = () => {
+    if (videos.length === 0) return;
+    
+    const nextIndex = (currentVideoIndex + 1) % videos.length;
+    setCurrentVideoIndex(nextIndex);
+    setVideoLink(videos[nextIndex].path);
+  };
+
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-start pt-12 px-4 md:px-6" style={{ background: '#0055FF' }}>
+      {/* Hamburger Menu Button - Top Right - Toggles Video */}
+      <motion.button
+        onClick={handlePlayVideo}
+        className="fixed top-6 right-6 z-50 p-3 rounded-lg transition-all hover:scale-110"
+        style={{
+          background: isPlayingVideo ? '#CCFF00' : 'rgba(255, 255, 255, 0.9)',
+          border: '2px solid #001A6E',
+          boxShadow: '4px 4px 0px rgba(0, 26, 110, 0.5)',
+        }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        <div className="flex flex-col gap-1.5">
+          <span className="block w-6 h-0.5" style={{ background: '#001A6E' }}></span>
+          <span className="block w-6 h-0.5" style={{ background: '#001A6E' }}></span>
+          <span className="block w-6 h-0.5" style={{ background: '#001A6E' }}></span>
+        </div>
+      </motion.button>
+
+      {/* Video Link Modal - REMOVED */}
+      <AnimatePresence>
+      </AnimatePresence>
+
+      {/* Video Player Fullscreen */}
+      <AnimatePresence>
+        {isPlayingVideo && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Exit Button - Top Right */}
+            <motion.button
+              onClick={handleCloseVideo}
+              className="absolute top-6 right-6 z-60 p-2 text-white text-xl font-bold"
+              style={{
+                background: 'transparent',
+              }}
+              whileHover={{ scale: 1.2 }}
+            >
+              ✕
+            </motion.button>
+
+            {/* Video Element */}
+            <video
+              ref={videoRef}
+              src={videoLink}
+              controls
+              autoPlay
+              onDoubleClick={handleVideoDoubleClick}
+              onEnded={handleVideoEnd}
+              className="w-full h-full object-contain cursor-pointer"
+              style={{ maxWidth: '100%', maxHeight: '100%' }}
+              crossOrigin="anonymous"
+              playsInline
+            />
+
+            {/* Timer Overlay - Bottom Right */}
+            <motion.div
+              className="absolute bottom-8 right-8 z-60 p-7"
+              style={{
+                background: 'rgba(0, 0, 0, 0.9)',
+                backdropFilter: 'blur(8px)',
+                imageRendering: 'pixelated',
+              }}
+              initial={{ opacity: 0, x: 20, y: 20 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="flex gap-6">
+                {/* Hours */}
+                <div className="flex flex-col items-center">
+                  <div style={{ fontSize: '43.2px', fontWeight: 'bold', color: '#CCFF00', fontFamily: 'var(--y2k-font-display)', lineHeight: '1' }}>
+                    {String(timeLeft.hours).padStart(2, '0')}
+                  </div>
+                  <div className="text-base font-bold uppercase mt-1" style={{ color: '#CCFF00', fontFamily: 'var(--y2k-font-ui)', letterSpacing: '0.1em' }}>
+                    H
+                  </div>
+                </div>
+
+                {/* Minutes */}
+                <div className="flex flex-col items-center">
+                  <div style={{ fontSize: '43.2px', fontWeight: 'bold', color: '#CCFF00', fontFamily: 'var(--y2k-font-display)', lineHeight: '1' }}>
+                    {String(timeLeft.minutes).padStart(2, '0')}
+                  </div>
+                  <div className="text-base font-bold uppercase mt-1" style={{ color: '#CCFF00', fontFamily: 'var(--y2k-font-ui)', letterSpacing: '0.1em' }}>
+                    M
+                  </div>
+                </div>
+
+                {/* Seconds */}
+                <div className="flex flex-col items-center">
+                  <div style={{ fontSize: '43.2px', fontWeight: 'bold', color: '#CCFF00', fontFamily: 'var(--y2k-font-display)', lineHeight: '1' }}>
+                    {String(timeLeft.seconds).padStart(2, '0')}
+                  </div>
+                  <div className="text-base font-bold uppercase mt-1" style={{ color: '#CCFF00', fontFamily: 'var(--y2k-font-ui)', letterSpacing: '0.1em' }}>
+                    S
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Break Commercial Overlay */}
       <BreakCommercial isVisible={isPaused} />
 
