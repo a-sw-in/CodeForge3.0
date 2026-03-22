@@ -1,0 +1,58 @@
+{
+  "videos": [
+    {
+      "id": 1,
+      "name": "Awareness Video",
+      "title": "Awareness Video Final",
+      "path": "/videos/awareness video final~2.mp4",
+      "type": "local",
+      "format": "mp4",
+      "description": "Awareness video final version"
+    },
+    {
+      "id": 2,
+      "name": "Car Reel",
+      "title": "I Turn Car Reel",
+      "path": "/videos/I turn car reel.mp4",
+      "type": "local",
+      "format": "mp4",
+      "description": "Car reel video"
+    },
+    {
+      "id": 3,
+      "name": "InShot Video 1",
+      "title": "InShot 20260321 143811270",
+      "path": "/videos/InShot_20260321_143811270.mp4",
+      "type": "local",
+      "format": "mp4",
+      "description": "InShot edited video 1"
+    },
+    {
+      "id": 4,
+      "name": "InShot Video 2",
+      "title": "InShot 20260321 191959738",
+      "path": "/videos/InShot_20260321_191959738.mp4",
+      "type": "local",
+      "format": "mp4",
+      "description": "InShot edited video 2"
+    },
+    {
+      "id": 5,
+      "name": "InShot Video 4",
+      "title": "InShot 20260322 001325523",
+      "path": "/videos/InShot_20260322_001325523.mp4",
+      "type": "local",
+      "format": "mp4",
+      "description": "InShot edited video 4"
+    },
+    {
+      "id": 6,
+      "name": "InShot Video 5",
+      "title": "InShot 20260322 003210326",
+      "path": "/videos/InShot_20260322_003210326.mp4",
+      "type": "local",
+      "format": "mp4",
+      "description": "InShot edited video 5"
+    }
+  ]
+}

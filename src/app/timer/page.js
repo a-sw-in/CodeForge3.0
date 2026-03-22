@@ -28,11 +28,29 @@ export default function CountdownTimer() {
   const [loading, setLoading] = useState(true);
   const [serverOffset, setServerOffset] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [videoLink, setVideoLink] = useState('/videos/demo.mkv'); // Set your default video link here
+  const [videoLink, setVideoLink] = useState('');
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [videos, setVideos] = useState([]);
   const videoRef = useRef(null);
+
+  // Fetch videos from JSON file on mount
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch('/data/videos.json');
+        const data = await response.json();
+        if (data.videos && data.videos.length > 0) {
+          setVideos(data.videos);
+          setVideoLink(data.videos[0].path);
+          setCurrentVideoIndex(0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch videos:', error);
+      }
+    };
+    fetchVideos();
+  }, []);
 
   // Fetch server time and calculate offset - ONLY ON PAGE LOAD
   useEffect(() => {
@@ -70,21 +88,13 @@ export default function CountdownTimer() {
     if (loading) return;
 
     let eventSource = null;
-    let fallbackPollInterval = null;
-    let sseConnected = false;
 
     const connectSSE = () => {
       console.log('[Timer] Attempting SSE connection...');
       eventSource = new EventSource('/api/timer/events');
 
       eventSource.onopen = () => {
-        sseConnected = true;
         console.log('✅ SSE Connection established!');
-        // Stop fallback polling when SSE connects
-        if (fallbackPollInterval) {
-          clearInterval(fallbackPollInterval);
-          fallbackPollInterval = null;
-        }
       };
 
       eventSource.onmessage = (event) => {
@@ -127,32 +137,8 @@ export default function CountdownTimer() {
       };
 
       eventSource.onerror = (error) => {
-        sseConnected = false;
-        console.error('❌ SSE connection error, using fallback polling');
+        console.error('❌ SSE connection error:', error);
         eventSource.close();
-        
-        // Start fallback polling if SSE fails
-        if (!fallbackPollInterval) {
-          console.log('[Timer] Starting fallback polling...');
-          fallbackPollInterval = setInterval(() => {
-            fetch('/api/timer')
-              .then(res => res.json())
-              .then(data => {
-                if (data.success) {
-                  setTimerActive(data.timerActive);
-                  setIsPaused(data.isPaused);
-                  
-                  const remaining = data.timeRemaining;
-                  const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
-                  const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                  const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                  const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-                  setTimeLeft({ days, hours, minutes, seconds });
-                }
-              })
-              .catch(err => console.error('Fallback poll error:', err));
-          }, 5000); // Poll every 5 seconds as fallback
-        }
       };
     };
 
@@ -162,10 +148,6 @@ export default function CountdownTimer() {
       if (eventSource) {
         console.log('Closing SSE connection');
         eventSource.close();
-      }
-      if (fallbackPollInterval) {
-        console.log('Stopping fallback polling');
-        clearInterval(fallbackPollInterval);
       }
     };
   }, [loading]);
@@ -208,8 +190,10 @@ export default function CountdownTimer() {
     if (videoRef.current && isPlayingVideo) {
       videoRef.current.muted = false;
       videoRef.current.volume = 1;
+      // Play video when it changes
+      videoRef.current.play().catch(err => console.log('Play error:', err));
     }
-  }, [isPlayingVideo]);
+  }, [isPlayingVideo, videoLink]);
 
   if (loading) {
     return (
