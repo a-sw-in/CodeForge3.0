@@ -63,6 +63,15 @@ export async function generatePdfFromSvg(svgPath, data = {}) {
     svgContent = svgContent.replace(/{{TEAM_MEMBER}}/g, data.teamMember || 'Team Member');
     svgContent = svgContent.replace(/{{DATE}}/g, data.date || new Date().toLocaleDateString());
 
+    // Extract width and height from viewBox to eliminate all white spaces
+    let pdfWidth = 960;
+    let pdfHeight = 520;
+    const viewBoxMatch = svgContent.match(/viewBox="[\d\.]+\s+[\d\.]+\s+([\d\.]+)\s+([\d\.]+)"/);
+    if (viewBoxMatch) {
+      pdfWidth = Math.ceil(parseFloat(viewBoxMatch[1]));
+      pdfHeight = Math.ceil(parseFloat(viewBoxMatch[2]));
+    }
+    
     // Escape single quotes and create HTML wrapper
     const escapedSvg = svgContent.replace(/'/g, "\\'");
     const htmlContent = `
@@ -73,23 +82,25 @@ export async function generatePdfFromSvg(svgPath, data = {}) {
         <style>
           @page {
             margin: 0;
-            size: 960px 520px;
+            size: ${pdfWidth}px ${pdfHeight}px;
           }
           html, body {
             margin: 0;
             padding: 0;
-            width:960px;
-            height:520px;
+            width: ${pdfWidth}px;
+            height: ${pdfHeight}px;
             overflow: hidden;
             background: transparent;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-size: 0;
+            line-height: 0;
           }
           svg {
             display: block;
             width: 100%;
             height: 100%;
+            margin: 0;
+            padding: 0;
+            vertical-align: top;
           }
         </style>
       </head>
@@ -108,8 +119,8 @@ export async function generatePdfFromSvg(svgPath, data = {}) {
 
     // Generate PDF with optimized settings
     const pdfBuffer = await page.pdf({
-      width: '960px',
-      height: '520px',
+      width: `${pdfWidth}px`,
+      height: `${pdfHeight}px`,
       printBackground: true,
       omitBackground: true,
       scale: 1.0,
