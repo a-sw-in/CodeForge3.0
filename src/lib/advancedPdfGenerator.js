@@ -73,13 +73,13 @@ export async function generatePdfFromSvg(svgPath, data = {}) {
         <style>
           @page {
             margin: 0;
-            size: 960px 551px;
+            size: 960px 520px;
           }
           html, body {
             margin: 0;
             padding: 0;
-            width:100%;
-            height:auto;
+            width:960px;
+            height:520px;
             overflow: hidden;
             background: transparent;
             display: flex;
@@ -109,7 +109,7 @@ export async function generatePdfFromSvg(svgPath, data = {}) {
     // Generate PDF with optimized settings
     const pdfBuffer = await page.pdf({
       width: '960px',
-      height: '500px',
+      height: '520px',
       printBackground: true,
       omitBackground: true,
       scale: 1.0,
