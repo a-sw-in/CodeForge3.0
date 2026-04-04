@@ -15,9 +15,20 @@ function isValidEmail(email) {
 
 async function sendTicketEmail(teamData, ticketPDF) {
   try {
-    // Validate email before attempting to send
-    if (!isValidEmail(teamData.leader_email)) {
-      throw new Error(`❌ Invalid email address: "${teamData.leader_email}". Please fix this email in the database (check for duplicate @ symbols).`);
+    // Prepare email recipients (all team members)
+    const recipients = [teamData.leader_email];
+    
+    // Add all members' emails
+    if (teamData.member2_email) recipients.push(teamData.member2_email);
+    if (teamData.member3_email) recipients.push(teamData.member3_email);
+    if (teamData.member4_email) recipients.push(teamData.member4_email);
+
+    // Remove duplicates and validate emails
+    const uniqueRecipients = [...new Set(recipients)]
+      .filter(email => email && isValidEmail(email));
+
+    if (uniqueRecipients.length === 0) {
+      throw new Error('No valid email addresses to send ticket to');
     }
     
     const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
@@ -30,9 +41,9 @@ async function sendTicketEmail(teamData, ticketPDF) {
       <!DOCTYPE html>
       <html>
         <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px;">
-          <p>Hi ${teamData.leader_name},</p>
+          <p>Hi Team,</p>
           
-          <p>Your team ${teamData.team_name} has been approved for CodeForge 3.0, the 24-hour hackathon by IEEE UCEK Branch.</p>
+          <p>Your team <strong>${teamData.team_name}</strong> has been approved for CodeForge 3.0, the 24-hour hackathon by IEEE UCEK Branch.</p>
           
           <p>
             <strong>Team Details</strong><br>
@@ -42,13 +53,13 @@ async function sendTicketEmail(teamData, ticketPDF) {
             Leader: ${teamData.leader_name}
           </p>
           
-          <p>Your entry ticket is attached as a PDF.</p>
+          <p>Your entry ticket is attached as a PDF. Please keep it safe and bring it during the hackathon event.</p>
           
           <p>Further updates will be shared soon.</p>
           
           <p>
             Regards,<br>
-            Team CodeForge 3.0<br>
+            <strong>Team CodeForge 3.0</strong><br>
             IEEE UCEK Branch
           </p>
         </body>
@@ -56,10 +67,13 @@ async function sendTicketEmail(teamData, ticketPDF) {
     `;
     
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-    sendSmtpEmail.to = [{ 
-      email: teamData.leader_email, 
-      name: teamData.leader_name 
-    }];
+    
+    // Add all recipients
+    sendSmtpEmail.to = uniqueRecipients.map(email => ({
+      email: email,
+      name: teamData.team_name
+    }));
+    
     sendSmtpEmail.sender = { 
       email: process.env.BREVO_SENDER_EMAIL,
       name: process.env.BREVO_SENDER_NAME || 'CodeForge 3.0' 
@@ -75,7 +89,7 @@ async function sendTicketEmail(teamData, ticketPDF) {
     
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
     
-    console.log('✅ Email sent successfully to:', teamData.leader_email);
+    console.log('✅ Ticket email sent successfully to:', uniqueRecipients);
     console.log('📧 Message ID:', result.messageId);
     
     return true;

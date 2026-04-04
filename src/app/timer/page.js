@@ -418,7 +418,7 @@ export default function CountdownTimer() {
                 Event Not Started
               </p>
               <p className="text-lg font-bold uppercase"
-                style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E' }}>
+                style={{ fontFamily:'var(--y2k-font-ui)', color: '#001A6E' }}>
                 Countdown begins soon...
               </p>
             </div>

@@ -1,4 +1,4 @@
-'use client';
+    'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,8 @@ export default function AdminDashboard({ inTabView = false }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTeam, setEditedTeam] = useState(null);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [certificateLoading, setCertificateLoading] = useState(null);
+  const [certificateMessage, setCertificateMessage] = useState('');
 
   // Check authentication
   useEffect(() => {
@@ -162,6 +164,40 @@ export default function AdminDashboard({ inTabView = false }) {
       setError(err.message || 'Failed to save changes');
     } finally {
       setSaveLoading(false);
+    }
+  };
+
+  const handleGenerateCertificate = async (categoryId) => {
+    setCertificateLoading(categoryId);
+    setCertificateMessage('');
+    
+    try {
+      const response = await fetch('/api/admin/certificates', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          teamId: selectedTeam.team_id,
+          categoryId: categoryId
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to generate certificate');
+      }
+
+      setCertificateMessage(`✓ ${data.message}`);
+      setTimeout(() => {
+        setCertificateMessage('');
+      }, 5000);
+    } catch (err) {
+      console.error('Certificate error:', err);
+      setError(err.message || 'Failed to generate certificate');
+    } finally {
+      setCertificateLoading(null);
     }
   };
 
@@ -1367,84 +1403,214 @@ export default function AdminDashboard({ inTabView = false }) {
                 </div>
               </div>
 
-              {/* Modal Footer - Y2K Buttons */}
-              <div className="px-6 py-4 flex justify-between items-center"
-                style={{ background: '#F8FAFC', borderTop: '3px solid #E2E8F0' }}>
-                <button
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 font-bold uppercase text-xs"
+              {/* Certificate Message */}
+              {certificateMessage && (
+                <div className="mb-4 p-3"
                   style={{
-                    fontFamily: 'var(--y2k-font-ui)',
-                    background: '#FFFFFF',
-                    color: '#64748B',
-                    border: '3px solid #CBD5E1',
-                    letterSpacing: '0.08em',
-                    boxShadow: '3px 3px 0px rgba(0, 0, 0, 0.1)',
-                  }}
-                >
-                  Close
-                </button>
-                <div className="flex gap-3">
-                  {isEditing ? (
-                    <>
+                    background: '#D1FAE5',
+                    border: '3px solid #10B981',
+                    boxShadow: '3px 3px 0px #001A6E',
+                  }}>
+                  <p className="text-sm font-medium" style={{ fontFamily: 'var(--y2k-font-ui)', color: '#047857' }}>
+                    {certificateMessage}
+                  </p>
+                </div>
+              )}
+
+              {/* Modal Footer - Y2K Buttons */}
+              <div className="px-6 py-4 space-y-4"
+                style={{ background: '#F8FAFC', borderTop: '3px solid #E2E8F0' }}>
+                
+                {/* Certificate Buttons Row 1 */}
+                <div className="flex gap-2 flex-wrap">
+                  <p className="w-full text-xs font-bold uppercase" 
+                    style={{ fontFamily: 'var(--y2k-font-ui)', color: '#001A6E', letterSpacing: '0.1em' }}>
+                    🎓 Send Certificate
+                  </p>
+                  <button
+                    onClick={() => handleGenerateCertificate(1)}
+                    disabled={certificateLoading !== null}
+                    className="px-3 py-2 font-bold uppercase text-xs flex items-center gap-1"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: certificateLoading === 1 ? '#CBD5E1' : '#FFD700',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      letterSpacing: '0.06em',
+                      boxShadow: '3px 3px 0px #001A6E',
+                      cursor: certificateLoading !== null ? 'not-allowed' : 'pointer',
+                      flex: 1,
+                      minWidth: '120px'
+                    }}
+                  >
+                    {certificateLoading === 1 ? (
+                      <>
+                        <div className="w-2 h-2 border-2 border-t-transparent rounded-full animate-spin"
+                          style={{ borderColor: '#001A6E', borderTopColor: 'transparent' }}></div>
+                        Cat 1
+                      </>
+                    ) : (
+                      '🥇 Category 1'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleGenerateCertificate(2)}
+                    disabled={certificateLoading !== null}
+                    className="px-3 py-2 font-bold uppercase text-xs flex items-center gap-1"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: certificateLoading === 2 ? '#CBD5E1' : '#E8E8E8',
+                      color: '#001A6E',
+                      border: '3px solid #001A6E',
+                      letterSpacing: '0.06em',
+                      boxShadow: '3px 3px 0px #001A6E',
+                      cursor: certificateLoading !== null ? 'not-allowed' : 'pointer',
+                      flex: 1,
+                      minWidth: '120px'
+                    }}
+                  >
+                    {certificateLoading === 2 ? (
+                      <>
+                        <div className="w-2 h-2 border-2 border-t-transparent rounded-full animate-spin"
+                          style={{ borderColor: '#001A6E', borderTopColor: 'transparent' }}></div>
+                        Cat 2
+                      </>
+                    ) : (
+                      '🥈 Category 2'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleGenerateCertificate(3)}
+                    disabled={certificateLoading !== null}
+                    className="px-3 py-2 font-bold uppercase text-xs flex items-center gap-1"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: certificateLoading === 3 ? '#CBD5E1' : '#CD7F32',
+                      color: '#FFFFFF',
+                      border: '3px solid #001A6E',
+                      letterSpacing: '0.06em',
+                      boxShadow: '3px 3px 0px #001A6E',
+                      cursor: certificateLoading !== null ? 'not-allowed' : 'pointer',
+                      flex: 1,
+                      minWidth: '120px'
+                    }}
+                  >
+                    {certificateLoading === 3 ? (
+                      <>
+                        <div className="w-2 h-2 border-2 border-t-transparent rounded-full animate-spin"
+                          style={{ borderColor: '#FFFFFF', borderTopColor: 'transparent' }}></div>
+                        Cat 3
+                      </>
+                    ) : (
+                      '🥉 Category 3'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleGenerateCertificate(4)}
+                    disabled={certificateLoading !== null}
+                    className="px-3 py-2 font-bold uppercase text-xs flex items-center gap-1"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: certificateLoading === 4 ? '#CBD5E1' : '#0055FF',
+                      color: '#CCFF00',
+                      border: '3px solid #001A6E',
+                      letterSpacing: '0.06em',
+                      boxShadow: '3px 3px 0px #001A6E',
+                      cursor: certificateLoading !== null ? 'not-allowed' : 'pointer',
+                      flex: 1,
+                      minWidth: '120px'
+                    }}
+                  >
+                    {certificateLoading === 4 ? (
+                      <>
+                        <div className="w-2 h-2 border-2 border-t-transparent rounded-full animate-spin"
+                          style={{ borderColor: '#CCFF00', borderTopColor: 'transparent' }}></div>
+                        Cat 4
+                      </>
+                    ) : (
+                      '✨ Category 4'
+                    )}
+                  </button>
+                </div>
+
+                {/* Control Buttons Row */}
+                <div className="flex justify-between items-center gap-3 pt-2" style={{ borderTop: '2px solid #E2E8F0' }}>
+                  <button
+                    onClick={handleCloseModal}
+                    className="px-4 py-2 font-bold uppercase text-xs"
+                    style={{
+                      fontFamily: 'var(--y2k-font-ui)',
+                      background: '#FFFFFF',
+                      color: '#64748B',
+                      border: '3px solid #CBD5E1',
+                      letterSpacing: '0.08em',
+                      boxShadow: '3px 3px 0px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    Close
+                  </button>
+                  <div className="flex gap-3">
+                    {isEditing ? (
+                      <>
+                        <button
+                          onClick={handleEditToggle}
+                          disabled={saveLoading}
+                          className="px-4 py-2 font-bold uppercase text-xs"
+                          style={{
+                            fontFamily: 'var(--y2k-font-ui)',
+                            background: '#FFFFFF',
+                            color: '#64748B',
+                            border: '3px solid #CBD5E1',
+                            letterSpacing: '0.08em',
+                            boxShadow: '3px 3px 0px rgba(0, 0, 0, 0.1)',
+                            cursor: saveLoading ? 'not-allowed' : 'pointer',
+                            opacity: saveLoading ? 0.6 : 1,
+                          }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSaveChanges}
+                          disabled={saveLoading}
+                          className="px-4 py-2 font-bold uppercase text-xs flex items-center gap-2"
+                          style={{
+                            fontFamily: 'var(--y2k-font-ui)',
+                            background: saveLoading ? '#CBD5E1' : '#CCFF00',
+                            color: '#001A6E',
+                            border: '3px solid #001A6E',
+                            letterSpacing: '0.08em',
+                            boxShadow: '4px 4px 0px #001A6E',
+                            cursor: saveLoading ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          {saveLoading ? (
+                            <>
+                              <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                                style={{ borderColor: '#001A6E', borderTopColor: 'transparent' }}></div>
+                              Saving...
+                            </>
+                          ) : (
+                            '💾 Save Changes'
+                          )}
+                        </button>
+                      </>
+                    ) : (
                       <button
                         onClick={handleEditToggle}
-                        disabled={saveLoading}
                         className="px-4 py-2 font-bold uppercase text-xs"
                         style={{
                           fontFamily: 'var(--y2k-font-ui)',
-                          background: '#FFFFFF',
-                          color: '#64748B',
-                          border: '3px solid #CBD5E1',
-                          letterSpacing: '0.08em',
-                          boxShadow: '3px 3px 0px rgba(0, 0, 0, 0.1)',
-                          cursor: saveLoading ? 'not-allowed' : 'pointer',
-                          opacity: saveLoading ? 0.6 : 1,
-                        }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={handleSaveChanges}
-                        disabled={saveLoading}
-                        className="px-4 py-2 font-bold uppercase text-xs flex items-center gap-2"
-                        style={{
-                          fontFamily: 'var(--y2k-font-ui)',
-                          background: saveLoading ? '#CBD5E1' : '#CCFF00',
-                          color: '#001A6E',
+                          background: '#001A6E',
+                          color: '#FFFFFF',
                           border: '3px solid #001A6E',
                           letterSpacing: '0.08em',
-                          boxShadow: '4px 4px 0px #001A6E',
-                          cursor: saveLoading ? 'not-allowed' : 'pointer',
+                          boxShadow: '4px 4px 0px rgba(0, 0, 0, 0.2)',
                         }}
                       >
-                        {saveLoading ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-                              style={{ borderColor: '#001A6E', borderTopColor: 'transparent' }}></div>
-                            Saving...
-                          </>
-                        ) : (
-                          '💾 Save Changes'
-                        )}
+                        ✏️ Edit
                       </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={handleEditToggle}
-                      className="px-4 py-2 font-bold uppercase text-xs"
-                      style={{
-                        fontFamily: 'var(--y2k-font-ui)',
-                        background: '#001A6E',
-                        color: '#FFFFFF',
-                        border: '3px solid #001A6E',
-                        letterSpacing: '0.08em',
-                        boxShadow: '4px 4px 0px rgba(0, 0, 0, 0.2)',
-                      }}
-                    >
-                      ✏️ Edit
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
