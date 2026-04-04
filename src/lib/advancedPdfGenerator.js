@@ -65,11 +65,11 @@ export async function generatePdfFromSvg(svgPath, data = {}) {
 
     // Extract width and height from viewBox to eliminate all white spaces
     let pdfWidth = 960;
-    let pdfHeight = 520;
+    let pdfHeight = 540;
     const viewBoxMatch = svgContent.match(/viewBox="[\d\.]+\s+[\d\.]+\s+([\d\.]+)\s+([\d\.]+)"/);
     if (viewBoxMatch) {
-      pdfWidth = Math.ceil(parseFloat(viewBoxMatch[1]));
-      pdfHeight = Math.ceil(parseFloat(viewBoxMatch[2]));
+      pdfWidth = parseFloat(viewBoxMatch[1]);
+      pdfHeight = parseFloat(viewBoxMatch[2]);
     }
     
     // Escape single quotes and create HTML wrapper
